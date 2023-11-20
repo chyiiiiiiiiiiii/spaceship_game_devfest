@@ -1,7 +1,7 @@
-import 'package:spaceship_game/utils.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/utils.dart';
 
 import 'command.dart';
 import 'main.dart';
@@ -30,11 +30,11 @@ enum BulletEnum { slowBullet, fastBullet }
 /// onDestroy(), and onHit()
 ///
 abstract class Bullet extends PositionComponent
-    with HasGameRef<AsteroidGame>, CollisionCallbacks {
+    with HasGameRef<SpaceshipGame>, CollisionCallbacks {
   static const double defaultSpeed = 100.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;
-  static final Vector2 defaulSize = Vector2.all(1.0);
+  static final Vector2 defaulSize = Vector2.all(3.0);
 
   // velocity vector for the bullet.
   late Vector2 _velocity;

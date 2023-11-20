@@ -1,9 +1,8 @@
-import 'package:spaceship_game/spaceship.dart';
-import 'package:spaceship_game/utils.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/spaceship.dart';
+import 'package:spaceship_game/utils.dart';
 
 import 'bullet.dart';
 import 'command.dart';
@@ -33,7 +32,7 @@ enum GameBonusEnum { ufoBonus }
 /// onDestroy(), and onHit()
 ///
 abstract class GameBonus extends PositionComponent
-    with CollisionCallbacks, HasGameRef<AsteroidGame> {
+    with CollisionCallbacks, HasGameRef<SpaceshipGame> {
   static const double defaultSpeed = 100.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;

@@ -1,9 +1,7 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spaceship_game/asteroid.dart';
@@ -176,7 +174,7 @@ class BulletFiredCommand extends Command {
       ..position =
           _getController().getSpaceship().getMuzzleComponent.absolutePosition
       ..velocity = velocity
-      ..size = Vector2(4, 4);
+      ..size = Vector2.all(8);
     Bullet myBullet = BulletFactory.create(context);
     // add the bullet to the controller's game tree
     _getController().add(myBullet);
@@ -523,15 +521,7 @@ class PlayerCollisionCommand extends Command {
       targetPlayer.onDestroy();
       FlameAudio.play('missile_hit.wav', volume: 0.7);
       // render the camera shake effect for a short duration
-      _getController().gameRef.camera.viewfinder.add(
-            MoveEffect.by(
-              Vector2(5, 5),
-              PerlinNoiseEffectController(
-                duration: 0.2,
-                frequency: 400,
-              ),
-            ),
-          );
+      _getController().gameRef.camera.shake(intensity: 20);
 
       // remove the bullet from the game
       _getController().remove(targetPlayer);

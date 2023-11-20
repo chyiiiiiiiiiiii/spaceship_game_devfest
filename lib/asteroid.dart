@@ -1,8 +1,8 @@
-import 'package:spaceship_game/spaceship.dart';
-import 'package:spaceship_game/utils.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/spaceship.dart';
+import 'package:spaceship_game/utils.dart';
 
 import 'bullet.dart';
 import 'command.dart';
@@ -32,7 +32,7 @@ enum AsteroidEnum { largeAsteroid, mediumAsteroid, smallAsteroid }
 /// onDestroy(), and onHit()
 ///
 abstract class Asteroid extends PositionComponent
-    with CollisionCallbacks, HasGameRef<AsteroidGame> {
+    with CollisionCallbacks, HasGameRef<SpaceshipGame> {
   static const double defaultSpeed = 100.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;

@@ -1,6 +1,8 @@
 import 'package:flame/events.dart';
+import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
@@ -13,7 +15,8 @@ Future<void> main() async {
   await Flame.device.setPortrait();
   await Flame.device.fullScreen();
 
-  final example = AsteroidGame();
+  final example = SpaceshipGame();
+
   runApp(
     GameWidget(game: example),
   );
@@ -33,7 +36,7 @@ Future<void> main() async {
 ///       at 1 seconds intervals. Currently we igniore this but in the next
 ///     - iteration of code we will add the next-level logic
 ///
-class AsteroidGame extends FlameGame
+class SpaceshipGame extends FlameGame
     with DragCallbacks, TapDetector, HasCollisionDetection, KeyboardEvents {
   static const String description = '''
     In this example we showcase how to use the joystick by creating simple
@@ -61,6 +64,8 @@ class AsteroidGame extends FlameGame
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
+    FlameAudio.bgm.initialize();
 
     /// initialize resources
     ///

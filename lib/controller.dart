@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:spaceship_game/asteroid.dart';
-import 'package:spaceship_game/command.dart';
-import 'package:spaceship_game/scoreboard.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/parallax.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spaceship_game/asteroid.dart';
+import 'package:spaceship_game/command.dart';
+import 'package:spaceship_game/scoreboard.dart';
 
 import 'game_bonus.dart';
 import 'json_utils.dart';
@@ -26,7 +26,7 @@ import 'spaceship.dart';
 ///
 /// The controller delegates the management of the commands to the [Broker]
 /// which in turns schedules the execution of all the pending commands
-class Controller extends Component with HasGameRef<AsteroidGame> {
+class Controller extends Component with HasGameRef<SpaceshipGame> {
   /// the number of lives that a player starts with (which is the start life
   /// and 3 extra lives)
   static const defaultNumberOfLives = 1;
@@ -216,6 +216,11 @@ class Controller extends Component with HasGameRef<AsteroidGame> {
     _broker.process();
     super.update(dt);
 
+    // WARNING: For web, audio-play need to after interacting the component.
+    if (!FlameAudio.bgm.isPlaying) {
+      FlameAudio.bgm.play('bgm.mp3', volume: 0.8);
+    }
+
     if (children.contains(player)) {
       parallax.parallax?.baseVelocity = _joystick.relativeDelta * 200;
     } else {
@@ -228,6 +233,7 @@ class Controller extends Component with HasGameRef<AsteroidGame> {
   @override
   FutureOr<void> onLoad() {
     debugPrint("<controller onload> loading resources...");
+
     return super.onLoad();
   }
 

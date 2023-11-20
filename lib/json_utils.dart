@@ -18,17 +18,17 @@ class JSONUtils {
   /// read the JSON data from a hardcoded location (for now)
   ///
   static dynamic readJSONInitData() async {
-    List _levels = [];
-    Map<String, dynamic> _jsonDataResolution = <String, dynamic>{};
-    List _jsonDataLevels = [];
+    List levels = [];
+    Map<String, dynamic> jsonDataResolution = <String, dynamic>{};
+    List jsonDataLevels = [];
     final String response =
         await rootBundle.loadString('assets/game_config.json');
     final data = await json.decode(response);
-    _jsonDataResolution = data["game_data"]["resolution"];
-    _jsonDataLevels = data["game_data"]["levels"];
-    debugPrint('{readJSONInitData} <resolution> : $_jsonDataResolution');
+    jsonDataResolution = data["game_data"]["resolution"];
+    jsonDataLevels = data["game_data"]["levels"];
+    debugPrint('{readJSONInitData} <resolution> : $jsonDataResolution');
     debugPrint(
-        '{readJSONInitData} <levels>: $_jsonDataLevels #: ${_jsonDataLevels.length}');
+        '{readJSONInitData} <levels>: $jsonDataLevels #: ${jsonDataLevels.length}');
     //_levels = _jsonData["levels"];
     return data;
   }
@@ -38,10 +38,10 @@ class JSONUtils {
   static List<GameLevel> extractGameLevels(dynamic data) {
     List<GameLevel> result = List.empty(growable: true);
 
-    List _jsonDataLevels = [];
-    _jsonDataLevels = data["game_data"]["levels"];
+    List jsonDataLevels = [];
+    jsonDataLevels = data["game_data"]["levels"];
 
-    for (var level in _jsonDataLevels) {
+    for (var level in jsonDataLevels) {
       GameLevel gameLevel = GameLevel();
       List<AsteroidBuildContext> asteroidContextList =
           _buildAsteroidData(level);
@@ -61,11 +61,11 @@ class JSONUtils {
   ///
   static Vector2 extractBaseGameResolution(dynamic data) {
     Vector2 result = Vector2.zero();
-    Map _jsonDataResolution = {};
+    Map jsonDataResolution = {};
 
-    _jsonDataResolution = data["game_data"]["resolution"];
-    result = Vector2(_jsonDataResolution["x"].toDouble(),
-        _jsonDataResolution["y"].toDouble());
+    jsonDataResolution = data["game_data"]["resolution"];
+    result = Vector2(
+        jsonDataResolution["x"].toDouble(), jsonDataResolution["y"].toDouble());
 
     return result;
   }
@@ -84,7 +84,7 @@ class JSONUtils {
       AsteroidBuildContext asteroid = AsteroidBuildContext();
       asteroid.asteroidType =
           AsteroidBuildContext.asteroidFromString(element['name']);
-      //AsteroidBuildContext.asteroidFromString(element['name']);
+
       asteroid.position = Vector2(
           element['position.x'].toDouble(), element['position.y'].toDouble());
       asteroid.velocity = Vector2(

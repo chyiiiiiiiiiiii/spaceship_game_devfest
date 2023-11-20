@@ -7,7 +7,7 @@ import 'main.dart';
 /// Simple class representing the running scoreboard for the game.
 /// We also have the high-score here to shows the user their best score
 ///
-class ScoreBoard extends PositionComponent with HasGameRef<AsteroidGame> {
+class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   int _highScore = 0;
   int _numOfShotsFired = 0;
   int _score = 0;

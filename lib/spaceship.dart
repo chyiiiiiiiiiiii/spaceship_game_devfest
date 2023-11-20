@@ -1,9 +1,9 @@
-import 'package:spaceship_game/bullet.dart';
-import 'package:spaceship_game/main.dart';
-import 'package:spaceship_game/utils.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/bullet.dart';
+import 'package:spaceship_game/main.dart';
+import 'package:spaceship_game/utils.dart';
 
 /// Simple enum which will hold enumerated names for all our [SpaceShip]-derived
 /// child classes
@@ -24,7 +24,7 @@ enum SpaceShipEnum { simpleSpaceShip }
 /// Please refer to the next batch of code where this refactor is done.
 ///
 abstract class SpaceShip extends SpriteComponent
-    with HasGameRef<AsteroidGame>, CollisionCallbacks {
+    with HasGameRef<SpaceshipGame>, CollisionCallbacks {
   // default values
   static const double defaultSpeed = 100.00;
   static const double defaultMaxSpeed = 300.00;
