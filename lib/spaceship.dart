@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import './bullet.dart';
 import './main.dart';
-import './utils.dart';
+import 'utils/utils.dart';
 
 /// Simple enum which will hold enumerated names for all our [SpaceShip]-derived
 /// child classes

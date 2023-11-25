@@ -2,7 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:spaceship_game/spaceship.dart';
-import 'package:spaceship_game/utils.dart';
+import 'package:spaceship_game/utils/utils.dart';
 
 import './bullet.dart';
 import './command.dart';
@@ -141,11 +141,6 @@ abstract class GameBonus extends PositionComponent
     }
 
     if (other is SpaceShip) {
-      //parent?.remove(this);
-      //parent?.add(ParticleGenerator.createSpriteParticleExplosion(
-      //  images: gameRef.images,
-      //  position: other.position,
-      //));
       PlayerCollisionCommand(other, this).addToController(gameRef.controller);
     }
 

@@ -1,8 +1,8 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:spaceship_game/utils.dart';
 
+import 'utils/utils.dart';
 import './command.dart';
 import './main.dart';
 
@@ -16,7 +16,10 @@ import './main.dart';
 ///  - add a new enumeration entry
 ///  - add a new switch case to the [BulletFactory] to create this new [Bullet]
 ///    instance when the enumeration entry is provided.
-enum BulletEnum { slowBullet, fastBullet }
+enum BulletEnum {
+  slowBullet,
+  fastBullet,
+}
 
 /// Bullet class is a [PositionComponent] so we get the angle and position of the
 /// element.
@@ -24,9 +27,9 @@ enum BulletEnum { slowBullet, fastBullet }
 /// This is an abstract class which needs to be extended to use Bullets.
 /// The most important game methods come from [PositionComponent] and are the
 /// update(), onLoad(), amd render() methods that need to be overridden to
-/// drive the behaviour of your Bullet on screen.
+/// drive the behavior of your Bullet on screen.
 ///
-/// You should also overide the abstract methods such as onCreate(),
+/// You should also override the abstract methods such as onCreate(),
 /// onDestroy(), and onHit()
 ///
 abstract class Bullet extends PositionComponent
@@ -40,13 +43,13 @@ abstract class Bullet extends PositionComponent
   late Vector2 _velocity;
 
   // speed of the bullet
-  late double _speed;
+  late final double _speed;
 
   // health of the bullet
-  late int? _health;
+  late final int? _health;
 
   // damage that the bullet does
-  late int? _damage;
+  late final int? _damage;
 
   //
   // default constructor with default values
@@ -74,10 +77,6 @@ abstract class Bullet extends PositionComponent
           position: position,
           anchor: Anchor.center,
         );
-
-  //
-  // empty class name constructor
-  Bullet.classname();
 
   ///////////////////////////////////////////////////////
   // getters
@@ -128,7 +127,6 @@ abstract class Bullet extends PositionComponent
   void _onOutOfBounds(Vector2 position) {
     if (Utils.isPositionOutOfBounds(gameRef.size, position)) {
       BulletDestroyCommand(this).addToController(gameRef.controller);
-      //FlameAudio.audioCache.play('missile_hit.wav');
     }
   }
 }
@@ -184,17 +182,17 @@ class FastBullet extends Bullet {
   @override
   void onCreate() {
     super.onCreate();
-    print("FastBullet onCreate called");
+    debugPrint("FastBullet onCreate called");
   }
 
   @override
   void onDestroy() {
-    print("FastBullet onDestroy called");
+    debugPrint("FastBullet onDestroy called");
   }
 
   @override
   void onHit(Component other) {
-    print("FastBullet onHit called");
+    debugPrint("FastBullet onHit called");
   }
 }
 
@@ -249,17 +247,17 @@ class SlowBullet extends Bullet {
   @override
   void onCreate() {
     super.onCreate();
-    print("SlowBullet onCreate called");
+    debugPrint("SlowBullet onCreate called");
   }
 
   @override
   void onDestroy() {
-    print("SlowBullet onDestroy called");
+    debugPrint("SlowBullet onDestroy called");
   }
 
   @override
   void onHit(Component other) {
-    print("SlowBullet onHit called");
+    debugPrint("SlowBullet onHit called");
   }
 }
 

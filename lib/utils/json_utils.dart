@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
 
-import './asteroid.dart';
-import './controller.dart';
-import './game_bonus.dart';
+import '../controller.dart';
+import '../game_bonus.dart';
 
 ///
 /// JSON Utilities for the Asteroids game

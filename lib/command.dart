@@ -4,7 +4,10 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import './asteroid.dart';
+import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
+import 'package:spaceship_game/asteroid/asteroid_factory.dart';
+
+import 'asteroid/asteroid.dart';
 import './bullet.dart';
 import './controller.dart';
 import './game_bonus.dart';

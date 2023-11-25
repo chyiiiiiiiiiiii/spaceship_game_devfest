@@ -8,14 +8,16 @@ import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
+import 'package:spaceship_game/asteroid/asteroid_factory.dart';
 
-import './asteroid.dart';
 import './command.dart';
 import './game_bonus.dart';
-import './json_utils.dart';
+import 'utils/json_utils.dart';
 import './main.dart';
 import './scoreboard.dart';
 import './spaceship.dart';
+import 'asteroid/asteroid.dart';
 
 /// The controller is the center piece of the game management.
 /// It is responsible for dispatching commands to be executed as well as
@@ -44,12 +46,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   /// on behalf o teh controller
   final Broker _broker = Broker();
 
-  /// state data
-  ///
-  ///
-
-  /// joystick
-  ///
   late JoystickComponent _joystick;
 
   /// all the game levels loaded from JSON
@@ -71,31 +67,24 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   late Vector2 _baseResolution;
   final Vector2 _resolutionMultiplier = Vector2.all(1.0);
 
-  /// Scoreboard data
-  ///
   late ScoreBoard _scoreboard;
 
-  /// state data methods
+  /// The SpaceShip being controlled by Joystick
   ///
-
-  //
-  // The player being controlled by Joystick
   late SpaceShip player;
 
-  //
-  // Easy access to Image manipulation of the game engine
-  @override
-  late Images images;
-
-  // Parallax image assets
+  /// Parallax image assets
+  ///
   final _parallaxImages = [
     ParallaxImageData('small_stars.png'),
     ParallaxImageData('big_stars.png'),
   ];
-  // parallax component
+
   late final ParallaxComponent parallax;
   final double parallaxSpeed = 25.0;
 
+  /// Restart when the game over.
+  ///
   late ButtonComponent restartButton;
 
   /// add a timer which will notify the controller of the passage of time
@@ -151,15 +140,11 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     add(controllerTimer);
 
     spawnNewPlayer();
-
-    debugPrint('{controller} <initializing... done>');
   }
 
   /// timer hook
   /// We will monitor here the exact passage of time in seconds for the game
   void timerNotification() {
-    debugPrint('{controller} <timer hook executing...>');
-
     /// Update time passage in scoreboard
     ///
     UpdateScoreboardTimePassageInfoCommand(_scoreboard).addToController(this);
@@ -169,13 +154,12 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     debugPrint(
         '{controller} <timer hook executing...> <bonus spawn> level: ${_scoreboard.getCurrentLevel} since start: ${_scoreboard.getTimeSinceStartOfLevel}');
     if (_scoreboard.getCurrentLevel > 0) {
-      int currTimeTick = _scoreboard.getTimeSinceStartOfLevel;
+      int currentTimeTick = _scoreboard.getTimeSinceStartOfLevel;
       if (_gameLevels[_scoreboard.getCurrentLevel - 1]
-          .shouldSpawnBonus(currTimeTick)) {
+          .shouldSpawnBonus(currentTimeTick)) {
         GameBonusBuildContext? context =
-            _gameLevels[_scoreboard.getCurrentLevel - 1].getBonus(currTimeTick);
-        debugPrint(
-            '{controller} <timer hook executing...> <found bonus context> $context');
+            _gameLevels[_scoreboard.getCurrentLevel - 1].getBonus(currentTimeTick);
+
         if (context != null) {
           /// build the bonus and add it to the game
           ///
@@ -190,9 +174,8 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
     /// Test for new level generation
     ///
-    if (isCurrLevelFinished()) {
+    if (isCurrentLevelFinished()) {
       debugPrint('{controller} <timer hook loading next level>');
-      // load next level if it exists
       loadNextGameLevel();
     }
 
@@ -200,7 +183,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     ///
     if (shouldRespawnPlayer()) {
       debugPrint('{controller} <timer hook respawning>');
-      // respawn the player
       spawnNewPlayer();
     }
 
@@ -217,9 +199,9 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     super.update(dt);
 
     // WARNING: For web, audio-play need to after interacting the component.
-    if (!FlameAudio.bgm.isPlaying) {
-      FlameAudio.bgm.play('bgm.mp3', volume: 0.8);
-    }
+    // if (!FlameAudio.bgm.isPlaying) {
+    //   FlameAudio.bgm.play('bgm.mp3', volume: 0.8);
+    // }
 
     if (children.contains(player)) {
       parallax.parallax?.baseVelocity = _joystick.relativeDelta * 200;
@@ -423,7 +405,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   /// We also adda a'barrier' of a couple seconds to pause teh level generation
   /// so that the player has a few seconds in between levels
   ///
-  bool isCurrLevelFinished() {
+  bool isCurrentLevelFinished() {
     if (currLevelObjectStack.isEmpty) {
       if (_levelDoneFlag == false) {
         _levelDoneFlag = true;

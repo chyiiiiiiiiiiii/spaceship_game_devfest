@@ -1,4 +1,4 @@
-import 'package:spaceship_game/utils.dart';
+import 'package:spaceship_game/utils/utils.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/particles.dart';
