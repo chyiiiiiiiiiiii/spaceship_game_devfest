@@ -55,7 +55,7 @@ class SpaceshipGame extends FlameGame
   bool debugMode = false;
 
   /// controller used to coordinate all game actions
-  Controller? controller;
+  late final Controller controller;
 
   //
   // angle of the ship being displayed on canvas
@@ -77,19 +77,19 @@ class SpaceshipGame extends FlameGame
     /// in Controller state data
     controller = Controller();
 
-    add(controller!);
+    add(controller);
 
     /// note that we use 'await' which will wait to load the data before any
     /// of the other code continues thsi way we know that out Controller's state
     /// data is correct.
-    await controller?.init();
+    await controller.init();
   }
 
   @override
   void update(double dt) {
     //
     //  show the angle of the player
-    debugPrint("current player angle: ${controller!.getSpaceship().angle}");
+    debugPrint("current player angle: ${controller.getSpaceship().angle}");
     debugPrint("<main update> number of children: ${children.length}");
     super.update(dt);
   }
@@ -100,7 +100,7 @@ class SpaceshipGame extends FlameGame
   // We will handle the tap action by the user to shoot a bullet
   // each time the user taps and lifts their finger
   void onTap() {
-    UserTapUpCommand(controller!.getSpaceship()).addToController(controller!);
+    UserTapUpCommand(controller.getSpaceship()).addToController(controller);
 
     super.onTap();
   }
@@ -120,7 +120,7 @@ class SpaceshipGame extends FlameGame
 
     if (isKeyDown) {
       if (isDownSpace) {
-        BulletFiredCommand().addToController(controller!);
+        BulletFiredCommand().addToController(controller);
         return KeyEventResult.handled;
       }
 
