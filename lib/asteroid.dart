@@ -88,7 +88,11 @@ abstract class Asteroid extends PositionComponent
     debugPrint("<Asteroid> <onCollision> detected... $other");
 
     if (other is Bullet) {
-      BulletCollisionCommand(other, this).addToController(gameRef.controller);
+      // let the bullet know its being destroyed.
+      other.onDestroy();
+      // remove the bullet from the game
+      gameRef.controller.remove(other);
+
       AsteroidCollisionCommand(this, other).addToController(gameRef.controller);
       UpdateScoreboardScoreCommand(gameRef.controller.getScoreBoard)
           .addToController(gameRef.controller);

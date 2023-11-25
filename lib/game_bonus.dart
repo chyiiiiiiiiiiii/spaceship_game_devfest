@@ -135,7 +135,11 @@ abstract class GameBonus extends PositionComponent
     debugPrint("<Game Bonus> <onCollision> detected... $other");
 
     if (other is Bullet) {
-      BulletCollisionCommand(other, this).addToController(gameRef.controller);
+      // let the asteroid know its being destroyed.
+      other.onDestroy();
+      // remove the bullet from the game
+      gameRef.controller.remove(other);
+
       GameBonusCollisionCommand(this, other)
           .addToController(gameRef.controller);
     }
