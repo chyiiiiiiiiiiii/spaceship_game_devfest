@@ -4,13 +4,13 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spaceship_game/asteroid.dart';
-import 'package:spaceship_game/bullet.dart';
-import 'package:spaceship_game/controller.dart';
-import 'package:spaceship_game/game_bonus.dart';
-import 'package:spaceship_game/particle_utils.dart';
-import 'package:spaceship_game/scoreboard.dart';
-import 'package:spaceship_game/spaceship.dart';
+import './asteroid.dart';
+import './bullet.dart';
+import './controller.dart';
+import './game_bonus.dart';
+import './particle_utils.dart';
+import './scoreboard.dart';
+import './spaceship.dart';
 
 /// Broker is just a simple deletgate to take care of processing lists of
 /// commands

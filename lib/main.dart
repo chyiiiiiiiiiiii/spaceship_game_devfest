@@ -6,8 +6,8 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-import 'command.dart';
-import 'controller.dart';
+import './command.dart';
+import './controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

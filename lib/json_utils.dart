@@ -4,9 +4,9 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'asteroid.dart';
-import 'controller.dart';
-import 'game_bonus.dart';
+import './asteroid.dart';
+import './controller.dart';
+import './game_bonus.dart';
 
 ///
 /// JSON Utilities for the Asteroids game

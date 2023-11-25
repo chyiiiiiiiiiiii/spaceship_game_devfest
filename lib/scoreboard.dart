@@ -1,8 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-import 'command.dart';
-import 'main.dart';
+import './command.dart';
+import './main.dart';
 
 /// Simple class representing the running scoreboard for the game.
 /// We also have the high-score here to shows the user their best score

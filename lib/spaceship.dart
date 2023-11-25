@@ -1,9 +1,9 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:spaceship_game/bullet.dart';
-import 'package:spaceship_game/main.dart';
-import 'package:spaceship_game/utils.dart';
+import './bullet.dart';
+import './main.dart';
+import './utils.dart';
 
 /// Simple enum which will hold enumerated names for all our [SpaceShip]-derived
 /// child classes

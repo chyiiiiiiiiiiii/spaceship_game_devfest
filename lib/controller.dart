@@ -8,14 +8,14 @@ import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spaceship_game/asteroid.dart';
-import 'package:spaceship_game/command.dart';
-import 'package:spaceship_game/scoreboard.dart';
 
-import 'game_bonus.dart';
-import 'json_utils.dart';
-import 'main.dart';
-import 'spaceship.dart';
+import './asteroid.dart';
+import './command.dart';
+import './game_bonus.dart';
+import './json_utils.dart';
+import './main.dart';
+import './scoreboard.dart';
+import './spaceship.dart';
 
 /// The controller is the center piece of the game management.
 /// It is responsible for dispatching commands to be executed as well as

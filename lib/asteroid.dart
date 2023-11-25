@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:spaceship_game/spaceship.dart';
 import 'package:spaceship_game/utils.dart';
 
-import 'bullet.dart';
-import 'command.dart';
-import 'main.dart';
+import './bullet.dart';
+import './command.dart';
+import './main.dart';
 
 /// Simple enum which will hold enumerated names for all our [Asteroid]-derived
 /// child classes
@@ -88,11 +88,7 @@ abstract class Asteroid extends PositionComponent
     debugPrint("<Asteroid> <onCollision> detected... $other");
 
     if (other is Bullet) {
-      // let the bullet know its being destroyed.
-      other.onDestroy();
-      // remove the bullet from the game
-      gameRef.controller.remove(other);
-
+      BulletCollisionCommand(other, this).addToController(gameRef.controller);
       AsteroidCollisionCommand(this, other).addToController(gameRef.controller);
       UpdateScoreboardScoreCommand(gameRef.controller.getScoreBoard)
           .addToController(gameRef.controller);
