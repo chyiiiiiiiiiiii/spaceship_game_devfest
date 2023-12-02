@@ -2,26 +2,21 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
 import 'package:spaceship_game/asteroid/asteroid_factory.dart';
+import 'package:spaceship_game/bullet/bullet_build_context.dart';
+import 'package:spaceship_game/bullet/bullet_factory.dart';
 
-import 'asteroid/asteroid.dart';
-import './bullet.dart';
-import './controller.dart';
-import './game_bonus.dart';
-import './particle_utils.dart';
-import './scoreboard.dart';
-import './spaceship.dart';
+import '../asteroid/asteroid.dart';
+import '../bullet/bullet.dart';
+import '../controller.dart';
+import '../game_bonus/game_bonus.dart';
+import '../other/particle_utils.dart';
+import '../score_board/score_board.dart';
+import '../space_ship/spaceship.dart';
 
-/// Broker is just a simple deletgate to take care of processing lists of
-/// commands
-///
-/// We keep two lists:
-///  - [_commandList] holds the commands waiting to be executed
-///  - [_pendingCommandList] holds all the pending commands. This list is
-///    used when the main list is being processed.
+/// Broker: 協調者，負責處理所有需要執行的動作命令
 class Broker {
   final _commandList = List<Command>.empty(growable: true);
   final _pendingCommandList = List<Command>.empty(growable: true);
@@ -34,14 +29,11 @@ class Broker {
 
   /// add the command to the broker to process
   void addCommand(Command command) {
-    debugPrint('{Adding command}: $command');
-
     /// pre-condition
     if (command.mustBeUnique()) {
       if (_duplicatesWatcher
           .any((element) => element.getId() == command.getId())) {
-        // the element is already in the queue so we diregard it
-        debugPrint('{Adding command}: $command <duplicate found and removed>');
+        // 重複指令就不進行處理了
         return;
       } else {
         // add it to the watched list
@@ -53,23 +45,15 @@ class Broker {
     _pendingCommandList.add(command);
   }
 
-  /// process all the scheduled commands
   void process() {
-    /// Process all current commands
-    ///
     for (var command in _commandList) {
-      // excecute each command
-      debugPrint('{Executing command}: $command');
       command.execute();
     }
 
-    /// clear the done list
     _commandList.clear();
 
-    /// move pending into current
     _commandList.addAll(_pendingCommandList);
 
-    /// empty out the pending
     _pendingCommandList.clear();
   }
 }
@@ -110,7 +94,7 @@ abstract class Command {
   /// One solution when you want to avoid duplicates is to use create the id as
   /// follows:
   ///     - use the title of the command
-  ///     - append to it the ':' followed by some sort of hashcode
+  ///     - append to it the ':' followed by some sort of hash code
   String getId() {
     return "Command:0";
   }
@@ -137,8 +121,6 @@ class UserTapUpCommand extends Command {
   /// work method. We simply fire a bullet in this example
   @override
   void execute() {
-    debugPrint(
-        '<UserTapUpCommand> player is alive: ${_getController().contains(player)}');
     // only fire the bullet if the player is alive
     if (_getController().contains(player)) {
       BulletFiredCommand().addToController(_getController());
@@ -152,22 +134,14 @@ class UserTapUpCommand extends Command {
   }
 }
 
-/// Implementation of the [Command] to create a new bullet and add it to the
-/// game
 class BulletFiredCommand extends Command {
-  /// deault constructor
   BulletFiredCommand();
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     BulletFiredSoundCommand().addToController(_getController());
 
-    //
-    // velocity vector pointing straight up.
-    // Represents 0 radians which is 0 desgrees
+    /// 預設子彈為往上發射
     var velocity = Vector2(0, -1);
     // rotate this vector to the same angle as the player
     velocity.rotate(_getController().getSpaceship().angle);
@@ -192,29 +166,19 @@ class BulletFiredCommand extends Command {
   }
 }
 
-/// Implementation of the [Command] to create a new bullet and add it to the
-/// game
 class BulletDestroyCommand extends Command {
-  /// the bullet being operated on
   late Bullet targetBullet;
 
-  /// deault constructor
   BulletDestroyCommand(Bullet bullet) {
     targetBullet = bullet;
   }
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     // let the bullet know its being destroyed.
     targetBullet.onDestroy();
-    debugPrint('<BulletDestroyCommand> execute id: ${targetBullet.hashCode}');
     // remove the bullet from the game
     if (_getController().children.any((element) => targetBullet == element)) {
-      debugPrint(
-          '<BulletDestroyCommand> removing id: ${targetBullet.hashCode}');
       _getController().remove(targetBullet);
     }
   }
@@ -225,8 +189,6 @@ class BulletDestroyCommand extends Command {
   }
 }
 
-/// Implementation of the [Command] to create a fireing and after-shot bullet
-/// sounds
 class BulletFiredSoundCommand extends Command {
   BulletFiredSoundCommand();
 
@@ -247,19 +209,14 @@ class BulletFiredSoundCommand extends Command {
 /// Implementation of the [Command] to notify a bullet that it has been hit
 ///
 class BulletCollisionCommand extends Command {
-  /// the bullet being operated on
   late Bullet targetBullet;
   late Component collisionObject;
 
-  /// deault constructor
   BulletCollisionCommand(Bullet bullet, Component other) {
     targetBullet = bullet;
     collisionObject = other;
   }
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     // let the bullet know its being destroyed.
@@ -289,37 +246,23 @@ class BulletCollisionCommand extends Command {
 class AsteroidCollisionCommand extends Command {
   /// the bullet being operated on
   late Asteroid _targetAsteroid;
-  late Component _collisionObject;
   Vector2? _collisionPosition;
 
-  /// deault constructor
-  AsteroidCollisionCommand(Asteroid asteroid, Component other) {
+  AsteroidCollisionCommand(Asteroid asteroid) {
     _targetAsteroid = asteroid;
-    _collisionObject = other;
     _collisionPosition = _targetAsteroid.position.clone();
   }
 
-  /// in this work method we check if the asteroid should be split into
-  /// small asteroids. We also remov this object from the stack and add any
-  /// new asteroids to the stack
   @override
   void execute() {
     // check if this is still on the stack
-    if (_getController().currLevelObjectStack.contains(_targetAsteroid)) {
-      _getController().currLevelObjectStack.remove(_targetAsteroid);
+    if (_getController().currentLevelObjectStack.contains(_targetAsteroid)) {
+      _getController().currentLevelObjectStack.remove(_targetAsteroid);
 
-      // check if the asteroid is splittable
+      /// 檢查隕石是否還能被分裂
       bool canBeSplit = _targetAsteroid.canBeSplit();
-      //
-      // if it can be split then split it by doing the following:
-      // calculate the velocity of the new asteroids
-      // then use the factory to create the new asteroids
-      // and then add them to the stack and the game
-      //
 
       if (canBeSplit) {
-        //
-        // create the smaller colllsion explosion
         ExplosionOfSplitAsteroidRenderCommand(_targetAsteroid)
             .addToController(_getController());
         //
@@ -334,42 +277,28 @@ class AsteroidCollisionCommand extends Command {
         asteroidAVelocity.rotate(pi / 4);
         asteroidBVelocity.rotate(-pi / 4);
 
-        debugPrint(
-            "<AsteroidCollisionCommand> <command> asteroid A: velocity angle ${asteroidAVelocity.angleToSigned(Vector2(0, -1))}");
-        // create the context for the asteroid creation
         AsteroidBuildContext contextA = AsteroidBuildContext()
           ..asteroidType = _targetAsteroid.getSplitAsteroids()[0]
           ..position = _collisionPosition!
-          ..velocity = asteroidAVelocity
-          ..multiplier = _getController().getResoltionMultiplier;
+          ..velocity = asteroidAVelocity;
 
         AsteroidBuildContext contextB = AsteroidBuildContext()
           ..asteroidType = _targetAsteroid.getSplitAsteroids()[1]
           ..position = _collisionPosition!
-          ..velocity = asteroidBVelocity
-          ..multiplier = _getController().getResoltionMultiplier;
+          ..velocity = asteroidBVelocity;
         // create the two new asteroids
         Asteroid asteroidA = AsteroidFactory.create(contextA);
         Asteroid asteroidB = AsteroidFactory.create(contextB);
-        debugPrint(
-            "<AsteroidCollisionCommand> <command> asteroid a ${asteroidA.hashCode}: ${asteroidA.toString()}");
-        debugPrint(
-            "<AsteroidCollisionCommand> <command> asteroid b ${asteroidB.hashCode}: ${asteroidB.toString()}");
 
         //
         // add them to the stack and the game
-        _getController().currLevelObjectStack.addAll([asteroidA, asteroidB]);
+        _getController().currentLevelObjectStack.addAll([asteroidA, asteroidB]);
         _getController().addAll([asteroidA, asteroidB]);
       } else {
-        // since it cannot be split we will generate a larger explosion
-        //
-        // create the larger colllsion explosion
         ExplosionOfDestroyedAsteroidRenderCommand(_targetAsteroid)
             .addToController(_getController());
       }
 
-      debugPrint(
-          "<AsteroidCollisionCommand> <command> ${_targetAsteroid.hashCode} canBeSplit: $canBeSplit");
       // let the asteroid know its being destroyed.
       _targetAsteroid.onDestroy();
       // remove the target asteroid  from the game
@@ -400,7 +329,6 @@ class UpdateScoreboardShotFiredCommand extends Command {
   void execute() {
     // update the scoreboard
     _scoreboard.addBulletFired();
-    debugPrint('<Scoreboard> $_scoreboard');
   }
 
   @override
@@ -423,7 +351,6 @@ class UpdateScoreboardScoreCommand extends Command {
   void execute() {
     // update the scoreboard
     _scoreboard.addScorePoints(1);
-    debugPrint('<Scoreboard> $_scoreboard');
   }
 
   @override
@@ -447,7 +374,6 @@ class UpdateScoreboardLevelInfoCommand extends Command {
     // update the scoreboard
     _scoreboard.progressLevel();
     _scoreboard.resetLevelTimer();
-    debugPrint('<Scoreboard> $_scoreboard');
   }
 
   @override
@@ -470,7 +396,6 @@ class UpdateScoreboardTimePassageInfoCommand extends Command {
   void execute() {
     // update the scoreboard
     _scoreboard.addTimeTick();
-    debugPrint('<Scoreboard> $_scoreboard');
   }
 
   @override
@@ -490,7 +415,6 @@ class ResetScoreboardCommand extends Command {
   @override
   void execute() {
     _scoreboard.reset();
-    debugPrint('<Scoreboard> $_scoreboard');
   }
 
   @override
@@ -506,15 +430,11 @@ class PlayerCollisionCommand extends Command {
   late SpaceShip targetPlayer;
   late Component collisionObject;
 
-  /// deault constructor
   PlayerCollisionCommand(SpaceShip player, Component other) {
     targetPlayer = player;
     collisionObject = other;
   }
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     //
@@ -529,7 +449,7 @@ class PlayerCollisionCommand extends Command {
       // remove the bullet from the game
       _getController().remove(targetPlayer);
       // generate explosion render
-      ExplosionOfSpacehipRenderCommand().addToController(_getController());
+      ExplosionOfSpaceshipRenderCommand().addToController(_getController());
       // remove the life
       PlayerRemoveLifeCommand().addToController(_getController());
     } else {
@@ -546,12 +466,8 @@ class PlayerCollisionCommand extends Command {
 /// Implementation of the [Command] to notify a player that it has been hit
 ///
 class PlayerRemoveLifeCommand extends Command {
-  /// deault constructor
   PlayerRemoveLifeCommand();
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     // remove the bullet from the game
@@ -568,22 +484,18 @@ class PlayerRemoveLifeCommand extends Command {
 /// done
 ///
 class GameOverCommand extends Command {
-  /// deault constructor
   GameOverCommand();
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() async {
     if (_getController().getScoreBoard.getScore >
         _getController().getScoreBoard.getHighScore) {
-      // Save an integer value to 'highScore' key.
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('highScore', _getController().getScoreBoard.getScore);
+      // 儲存最高分數
+      final sharedPreferences = await SharedPreferences.getInstance();
+      await sharedPreferences.setInt(
+          'highScore', _getController().getScoreBoard.getScore);
     }
 
-    // _getController().remove(_getController().getSpaceship());
     _getController().getScoreBoard.stop();
     _getController().removeJoystick();
     _getController().addRestartButton();
@@ -598,26 +510,21 @@ class GameOverCommand extends Command {
 /// Implementation of the [Command] to destroy the instance of game bonus
 /// game
 class GameBonusDestroyCommand extends Command {
-  /// the bullet being operated on
   late GameBonus targetBonus;
 
-  /// deault constructor
   GameBonusDestroyCommand(GameBonus bonus) {
     targetBonus = bonus;
   }
 
-  /// work method. We create a bullet based on the Spaceship location and angle
-  /// We currently hardcode the bullet type but this could be looked up from
-  /// the speceship.
   @override
   void execute() {
     // let the bullet know its being destroyed.
     targetBonus.onDestroy();
     // remove the bonus from the game and form the stack
     if (_getController()
-        .currLevelObjectStack
+        .currentLevelObjectStack
         .any((element) => targetBonus == element)) {
-      _getController().currLevelObjectStack.remove(targetBonus);
+      _getController().currentLevelObjectStack.remove(targetBonus);
     }
     if (_getController().children.any((element) => targetBonus == element)) {
       _getController().remove(targetBonus);
@@ -637,28 +544,17 @@ class GameBonusCollisionCommand extends Command {
   late GameBonus target;
   late Component collisionObject;
 
-  /// deault constructor
   GameBonusCollisionCommand(GameBonus gameBonus, Component other) {
     target = gameBonus;
     collisionObject = other;
   }
 
-  /// in this work method we check if the game bonus should be split into
-  /// small asteroids. We also remov this object from the stack and add any
-  /// new asteroids to the stack
   @override
   void execute() {
-    // create the larger colllsion explosion
     ExplosionOfGameBonusRenderCommand(target).addToController(_getController());
-    if (collisionObject is Bullet) {
-      // let the scoreboard know to update the score
-      UpdateScoreboardScoreCommand(_getController().getScoreBoard)
-          .addToController(_getController());
-    }
-    _getController().remove(collisionObject);
     // check if this is still on the stack
-    if (_getController().currLevelObjectStack.contains(target)) {
-      _getController().currLevelObjectStack.remove(target);
+    if (_getController().currentLevelObjectStack.contains(target)) {
+      _getController().currentLevelObjectStack.remove(target);
 
       // let the target know its being destroyed.
       target.onDestroy();
@@ -679,27 +575,24 @@ class GameBonusCollisionCommand extends Command {
 
 /// Implementation of the [Command] to create an explosion and add it to the
 /// game
-class ExplosionOfSpacehipRenderCommand extends Command {
-  /// deault constructor
-  ExplosionOfSpacehipRenderCommand();
+class ExplosionOfSpaceshipRenderCommand extends Command {
+  ExplosionOfSpaceshipRenderCommand();
 
-  /// work method. We create a an explosion based on the colllsion object where
-  /// we want the explosion to show up.
   @override
   void execute() {
-    // create the specific explosition for the specehip and add it to the game
+    // 為太空船新增爆炸粒子效果
     ExplosionBuildContext context = ExplosionBuildContext()
       ..position = _getController().getSpaceship().position
       ..images = _getController().getGameImages()
       ..explosionType = ExplosionEnum.fieryExplosion;
     ParticleSystemComponent explosion = ExplosionFactory.create(context);
-    // add the bullet to the controller's game tree
+
     _getController().add(explosion);
   }
 
   @override
   String getTitle() {
-    return "ExplosionOfSpacehipRenderCommand";
+    return "ExplosionOfSpaceshipRenderCommand";
   }
 }
 
@@ -709,21 +602,16 @@ class ExplosionOfDestroyedAsteroidRenderCommand extends Command {
   /// the asteroid being operated on
   late Asteroid _target;
 
-  /// deault constructor
   ExplosionOfDestroyedAsteroidRenderCommand(target) {
     _target = target;
   }
-
-  /// work method. We create a an explosion based on the colllsion object where
-  /// we want the explosion to show up.
   @override
   void execute() {
-    // create the specific explosition for the specehip and add it to the game
     ExplosionBuildContext context = ExplosionBuildContext()
       ..position = _target.position
       ..explosionType = ExplosionEnum.largeParticleExplosion;
     ParticleSystemComponent explosion = ExplosionFactory.create(context);
-    // add the bullet to the controller's game tree
+
     _getController().add(explosion);
   }
 
@@ -736,24 +624,19 @@ class ExplosionOfDestroyedAsteroidRenderCommand extends Command {
 /// Implementation of the [Command] to create an explosion and add it to the
 /// game
 class ExplosionOfSplitAsteroidRenderCommand extends Command {
-  /// the asteroid being operated on
   late Asteroid _target;
 
-  /// deault constructor
   ExplosionOfSplitAsteroidRenderCommand(target) {
     _target = target;
   }
 
-  /// work method. We create a an explosion based on the colllsion object where
-  /// we want the explosion to show up.
   @override
   void execute() {
-    // create the specific explosition for the specehip and add it to the game
     ExplosionBuildContext context = ExplosionBuildContext()
       ..position = _target.position
       ..explosionType = ExplosionEnum.mediumParticleExplosion;
     ParticleSystemComponent explosion = ExplosionFactory.create(context);
-    // add the bullet to the controller's game tree
+
     _getController().add(explosion);
   }
 
@@ -766,24 +649,19 @@ class ExplosionOfSplitAsteroidRenderCommand extends Command {
 /// Implementation of the [Command] to create an explosion and add it to the
 /// game
 class ExplosionOfGameBonusRenderCommand extends Command {
-  /// the asteroid being operated on
   late GameBonus _target;
 
-  /// deault constructor
   ExplosionOfGameBonusRenderCommand(target) {
     _target = target;
   }
 
-  /// work method. We create a an explosion based on the colllsion object where
-  /// we want the explosion to show up.
   @override
   void execute() {
-    // create the specific explosition for the specehip and add it to the game
     ExplosionBuildContext context = ExplosionBuildContext()
       ..position = _target.position
       ..explosionType = ExplosionEnum.bonusExplosion;
     ParticleSystemComponent explosion = ExplosionFactory.create(context);
-    // add the bullet to the controller's game tree
+
     _getController().add(explosion);
   }
 

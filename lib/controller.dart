@@ -5,41 +5,35 @@ import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/parallax.dart';
-import 'package:flame_audio/flame_audio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
 import 'package:spaceship_game/asteroid/asteroid_factory.dart';
+import 'package:spaceship_game/game.dart';
+import 'package:spaceship_game/game_bonus/game_bonus_build_context.dart';
+import 'package:spaceship_game/game_bonus/game_bonus_factory.dart';
+import 'package:spaceship_game/space_ship/space_ship_build_context.dart';
+import 'package:spaceship_game/space_ship/space_ship_factory.dart';
 
-import './command.dart';
-import './game_bonus.dart';
-import 'utils/json_utils.dart';
-import './main.dart';
-import './scoreboard.dart';
-import './spaceship.dart';
 import 'asteroid/asteroid.dart';
+import 'command/command.dart';
+import 'game_bonus/game_bonus.dart';
+import 'other/json_utils.dart';
+import 'score_board/score_board.dart';
+import 'space_ship/spaceship.dart';
 
-/// The controller is the center piece of the game management.
-/// It is responsible for dispatching commands to be executed as well as
-/// keeping the state of the game organized.
-///
-/// The state consists of all the game elements that participate in the
-/// messaging.
-///
-/// The controller delegates the management of the commands to the [Broker]
-/// which in turns schedules the execution of all the pending commands
+/// 管理者，掌握遊戲內的元件與操作
 class Controller extends Component with HasGameRef<SpaceshipGame> {
   /// the number of lives that a player starts with (which is the start life
   /// and 3 extra lives)
   static const defaultNumberOfLives = 1;
   static const defaultStartLevel = 0;
 
-  //
   // pause between levels or new lives in seconds
   static const timeoutPauseInSeconds = 3;
   int _pauseCountdown = 0;
   bool _levelDoneFlag = false;
-  int _respawnCountdown = 0;
+  int _createPlayerCountdown = 0;
   bool _playerDiedFlag = false;
 
   /// the broker which is a dedicated helper that executes all the commands
@@ -54,17 +48,15 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// a stack used to hold all the objects from the current level. Once this
   /// list/stack is empty we can go to the next level.
-  List currLevelObjectStack = List.empty(growable: true);
+  List currentLevelObjectStack = List.empty(growable: true);
 
   /// JSON Data from initialization
   late dynamic jsonData;
 
-  /// default resolution to which levels are tethered
-  ///
-  /// resolution multiplier is used to calculet the necessary changes in
-  /// position, size and velocity of different objects so that they are
-  /// correctly displayed in different reslutions
+  /// 遊戲設計的解析度
   late Vector2 _baseResolution;
+
+  /// 計算不同顯示裝置上的參數比例，可適用於元件的位置、大小、速度，保持最佳的顯示效果
   final Vector2 _resolutionMultiplier = Vector2.all(1.0);
 
   late ScoreBoard _scoreboard;
@@ -109,22 +101,15 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   ///
   /// It will initialize the inner state of the
   Future<void> init() async {
-    debugPrint('{controller} <initializing...>');
-
-    /// read JSON data
-    ///
     jsonData = await JSONUtils.readJSONInitData();
 
     /// read in the resolution and calculate the resolution multiplier
     ///
     _baseResolution = JSONUtils.extractBaseGameResolution(jsonData);
 
-    /// calculate the multipier
+    /// calculate the multiplier
     _resolutionMultiplier.x = gameRef.size.x / _baseResolution.x;
     _resolutionMultiplier.y = gameRef.size.y / _baseResolution.y;
-
-    debugPrint(
-        '{controller} <resolution>: [${gameRef.size.x}, ${gameRef.size.y}], $_baseResolution, $_resolutionMultiplier');
 
     await addScoreBoard();
     await addParallax();
@@ -149,109 +134,91 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     ///
     UpdateScoreboardTimePassageInfoCommand(_scoreboard).addToController(this);
 
-    /// Check for Bonus spawn
-    ///
-    debugPrint(
-        '{controller} <timer hook executing...> <bonus spawn> level: ${_scoreboard.getCurrentLevel} since start: ${_scoreboard.getTimeSinceStartOfLevel}');
     if (_scoreboard.getCurrentLevel > 0) {
       int currentTimeTick = _scoreboard.getTimeSinceStartOfLevel;
       if (_gameLevels[_scoreboard.getCurrentLevel - 1]
           .shouldSpawnBonus(currentTimeTick)) {
         GameBonusBuildContext? context =
-            _gameLevels[_scoreboard.getCurrentLevel - 1].getBonus(currentTimeTick);
+            _gameLevels[_scoreboard.getCurrentLevel - 1]
+                .getBonus(currentTimeTick);
 
         if (context != null) {
           /// build the bonus and add it to the game
           ///
           GameBonus? bonus = GameBonusFactory.create(context);
-          debugPrint(
-              '{controller} <timer hook executing...> <created bonus> $bonus');
-          currLevelObjectStack.add(bonus);
-          add(bonus!);
+          currentLevelObjectStack.add(bonus);
+
+          if (bonus == null) {
+            return;
+          }
+
+          add(bonus);
         }
       }
     }
 
-    /// Test for new level generation
-    ///
     if (isCurrentLevelFinished()) {
-      debugPrint('{controller} <timer hook loading next level>');
       loadNextGameLevel();
     }
 
-    /// Test for player respawn
-    ///
-    if (shouldRespawnPlayer()) {
-      debugPrint('{controller} <timer hook respawning>');
+    if (shouldCreatePlayer()) {
       spawnNewPlayer();
     }
-
-    debugPrint('{controller} <timer hook... done>');
   }
 
-  /// at each game update cycle the controller will instruct the broker
-  /// to process all outstanding commands
   @override
   void update(double dt) {
-    /// execute all the commands
-    ///
     _broker.process();
     super.update(dt);
 
-    // WARNING: For web, audio-play need to after interacting the component.
-    // if (!FlameAudio.bgm.isPlaying) {
-    //   FlameAudio.bgm.play('bgm.mp3', volume: 0.8);
-    // }
-
+    /// 更新視差背景
     if (children.contains(player)) {
-      parallax.parallax?.baseVelocity = _joystick.relativeDelta * 200;
+      parallax.parallax?.baseVelocity =
+          (gameRef.keyboardDirection + _joystick.relativeDelta) * 200;
     } else {
       parallax.parallax?.baseVelocity = Vector2.zero();
     }
-
-    debugPrint("<controller update> number of children: ${children.length}");
   }
 
   @override
-  FutureOr<void> onLoad() {
-    debugPrint("<controller onload> loading resources...");
-
-    return super.onLoad();
+  void render(Canvas canvas) {
+    TextPaint(
+      style: const TextStyle(
+        fontSize: 18.0,
+        fontFamily: 'Awesome Font',
+        color: Colors.grey,
+      ),
+    ).render(
+      canvas,
+      '(使用"方向鍵"操控)',
+      Vector2(gameRef.size.x - 180, gameRef.size.y - 60),
+    );
   }
 
   Future<void> addScoreBoard() async {
-    /// read the JSON data about the game levels and other game-related data
-    ///
+    // 取得遊戲關卡資訊
     _gameLevels = JSONUtils.extractGameLevels(jsonData);
-    debugPrint('{controller} <levels>: $_gameLevels');
 
-    /// initialize socreboard
-    ///
+    // 創建計分板
     _scoreboard =
         ScoreBoard(defaultNumberOfLives, defaultStartLevel, _gameLevels.length);
 
-    /// read in the high score if it exists and create the scoreboard data
-    ///
-    /// We are using an external package for this which you can find here:
-    /// https://pub.dev/packages/shared_preferences/install
-    ///
-
-    /// Obtain shared preferences.
+    // 創建本地資料庫
     final sharedPreferences = await SharedPreferences.getInstance();
-    // Try reading data from the 'highScore' key. If it doesn't exist, returns null.
+
+    // 載入最高分數
     int? userHighScore = sharedPreferences.getInt('highScore') ?? 0;
     _scoreboard.highScore = userHighScore;
-    debugPrint('{controller} <scoreboard>: $_scoreboard');
-    //
-    // initialize sub-components
+
+    // 添加計分板到遊戲裡
     add(_scoreboard);
   }
 
   void resetLevel() {
-    for (final asteroid in currLevelObjectStack) {
+    for (final asteroid in currentLevelObjectStack) {
       remove(asteroid);
     }
-    currLevelObjectStack.clear();
+    currentLevelObjectStack.clear();
     _currentGameLevelIndex = 0;
   }
 
@@ -277,8 +244,8 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     //
     // Actual Joystick component creation
     _joystick = JoystickComponent(
-      knob: CircleComponent(radius: 15, paint: knobPaint),
-      background: CircleComponent(radius: 50, paint: backgroundPaint),
+      knob: CircleComponent(radius: 30, paint: knobPaint),
+      background: CircleComponent(radius: 70, paint: backgroundPaint),
       margin: const EdgeInsets.only(left: 20, bottom: 20),
     );
 
@@ -297,7 +264,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       button: PositionComponent(
         children: [
           TextComponent(
-            text: 'Replay',
+            text: '重新開始',
           ),
         ],
       ),
@@ -317,7 +284,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     remove(restartButton);
   }
 
-  /// schedule a [command] for processing by delgating it to the broker
   void addCommand(Command command) {
     _broker.addCommand(command);
   }
@@ -332,7 +298,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     return _baseResolution;
   }
 
-  Vector2 get getResoltionMultiplier {
+  Vector2 get getResolutionMultiplier {
     return _resolutionMultiplier;
   }
 
@@ -340,24 +306,12 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     return _scoreboard;
   }
 
-  /// Helper Methods
-  ///
-
-  /// this method loads the next game level and displays it on screen
-  ///
+  /// 載入下一個遊戲關卡
   void loadNextGameLevel() {
     // reset data
     List<Asteroid> asteroids = List.empty(growable: true);
-    List<GameBonus> gamebonuses = List.empty(growable: true);
 
-    debugPrint('{controller} <level load> <clearing objects stack...>');
-    // clear the object stack just in case its not empty
-    currLevelObjectStack.clear();
-
-    debugPrint(
-        '{controller} <level load> <current level: $_currentGameLevelIndex>');
-    debugPrint(
-        '{controller} <level load> <levels length: ${_gameLevels.length}>');
+    currentLevelObjectStack.clear();
 
     // make sure that there are more levels left
     //
@@ -366,17 +320,13 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       //
       for (var asteroid in _gameLevels[_currentGameLevelIndex].asteroidConfig) {
         // add the multiplier to the asteroid context
-        //
         asteroid.multiplier = _resolutionMultiplier;
+
         // create each asteroid
-        //
         Asteroid newAsteroid = AsteroidFactory.create(asteroid);
         asteroids.add(newAsteroid);
-        //
-        //
-        currLevelObjectStack.add(asteroids.last);
-        debugPrint(
-            '{controller} <level load> <adding object ${asteroids.last}>');
+
+        currentLevelObjectStack.add(asteroids.last);
       }
       // add all the asteroids to the component tree so that they are part of
       // the game play
@@ -392,21 +342,16 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   void spawnNewPlayer() {
     //
     // creating the player that will be controlled by our joystick
-    PlayerBuildContext context = PlayerBuildContext()
+    SpaceShipBuildContext context = SpaceShipBuildContext()
       ..spaceShipType = SpaceShipEnum.simpleSpaceShip
-      ..joystick = _joystick
-      ..multiplier = getResoltionMultiplier;
+      ..joystick = _joystick;
     player = SpaceShipFactory.create(context);
     add(player);
   }
 
-  /// check if the current level is done.
-  ///
-  /// We also adda a'barrier' of a couple seconds to pause teh level generation
-  /// so that the player has a few seconds in between levels
-  ///
+  /// 檢查目前關卡是否完成了
   bool isCurrentLevelFinished() {
-    if (currLevelObjectStack.isEmpty) {
+    if (currentLevelObjectStack.isEmpty) {
       if (_levelDoneFlag == false) {
         _levelDoneFlag = true;
         _pauseCountdown = timeoutPauseInSeconds;
@@ -429,22 +374,22 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// check if the current level is done.
   ///
-  /// We also adda a'barrier' of a couple seconds to pause teh level generation
+  /// We also add a'barrier' of a couple seconds to pause teh level generation
   /// so that the player has a few seconds in between levels
   ///
-  bool shouldRespawnPlayer() {
+  bool shouldCreatePlayer() {
     if (!children.any((element) => element is SpaceShip)) {
       if (_playerDiedFlag == false) {
         _playerDiedFlag = true;
-        _respawnCountdown = timeoutPauseInSeconds;
+        _createPlayerCountdown = timeoutPauseInSeconds;
         return false;
       }
       if (_playerDiedFlag == true && _scoreboard.getLivesLeft > 0) {
-        if (_respawnCountdown == 0) {
+        if (_createPlayerCountdown == 0) {
           _playerDiedFlag = false;
           return true;
         } else {
-          _respawnCountdown--;
+          _createPlayerCountdown--;
           return false;
         }
       }
@@ -463,10 +408,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   }
 }
 
-/// This is a single game level which can hold asteroid position and velocity
-/// data, as well as UFO Bonus data which woudl be time-stamped to the specific
-/// moment when it should how up in that level.
-///
 class GameLevel {
   List<AsteroidBuildContext> asteroidConfig = [];
   List<GameBonusBuildContext> gameBonusConfig = [];
@@ -475,26 +416,17 @@ class GameLevel {
   GameLevel();
 
   void init() {
-    debugPrint('<GameLevel> <init> bonus length: ${gameBonusConfig.length}');
     for (GameBonusBuildContext bonus in gameBonusConfig) {
       _gameBonusMap[bonus.timeTriggerSeconds] = bonus;
     }
-
-    debugPrint('<GameLevel> <init> bonus: $_gameBonusMap');
-    debugPrint('<GameLevel> <init> level: bonus keys: ${_gameBonusMap.keys}');
   }
 
   /// business methods
   ///
   bool shouldSpawnBonus(int timeTick) {
-    debugPrint('<shouldSpawnBonus> <procesing...> $_gameBonusMap');
-    debugPrint(
-        '<shouldSpawnBonus> <time tick> $timeTick, element: ${_gameBonusMap[timeTick]}');
     if (_gameBonusMap[timeTick] != null) {
-      debugPrint('<shouldSpawnBonus> <YES>');
       return true;
     } else {
-      debugPrint('<shouldSpawnBonus> <NO>');
       return false;
     }
   }

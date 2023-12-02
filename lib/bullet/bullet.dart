@@ -1,43 +1,22 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/game.dart';
 
-import 'utils/utils.dart';
-import './command.dart';
-import './main.dart';
+import '../command/command.dart';
+import '../other/utils.dart';
 
-/// Simple enum which will hold enumerated names for all our [Bullet]-derived
-/// child classes
-///
-/// As you add moreBullet implementation you will add a name hereso that we
-/// can then easly create bullets using the [BulletFactory]
-/// The steps are as follows:
-///  - extend the Bullet class with a new Bullet implementation
-///  - add a new enumeration entry
-///  - add a new switch case to the [BulletFactory] to create this new [Bullet]
-///    instance when the enumeration entry is provided.
 enum BulletEnum {
   slowBullet,
   fastBullet,
 }
 
-/// Bullet class is a [PositionComponent] so we get the angle and position of the
-/// element.
-///
-/// This is an abstract class which needs to be extended to use Bullets.
-/// The most important game methods come from [PositionComponent] and are the
-/// update(), onLoad(), amd render() methods that need to be overridden to
-/// drive the behavior of your Bullet on screen.
-///
-/// You should also override the abstract methods such as onCreate(),
-/// onDestroy(), and onHit()
-///
 abstract class Bullet extends PositionComponent
     with HasGameRef<SpaceshipGame>, CollisionCallbacks {
   static const double defaultSpeed = 100.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;
-  static final Vector2 defaulSize = Vector2.all(3.0);
+  static final Vector2 defaultSize = Vector2.all(3.0);
 
   // velocity vector for the bullet.
   late Vector2 _velocity;
@@ -59,7 +38,7 @@ abstract class Bullet extends PositionComponent
         _health = defaultHealth,
         _damage = defaultDamage,
         super(
-          size: defaulSize,
+          size: defaultSize,
           position: position,
           anchor: Anchor.center,
         );
@@ -97,32 +76,13 @@ abstract class Bullet extends PositionComponent
     _onOutOfBounds(position);
   }
 
-  ////////////////////////////////////////////////////////
-  // business methods
-  //
-
-  //
-  // Called when the Bullet has been created.
   void onCreate() {
-    // to improve accurace of collision detection we make the hitbox
-    // about 4 times larger for the bullets.
-    add(
-      RectangleHitbox(),
-    );
-    //addHitbox(HitboxRectangle());
+    add(RectangleHitbox());
   }
 
-  //
-  // Called when the bullet is being destroyed.
   void onDestroy();
 
-  //
-  // Called when the Bullet has been hit. The ‘other’ is what the bullet hit, or was hit by.
   void onHit(Component other);
-
-  ////////////////////////////////////////////////////////////
-  // Helper methods
-  //
 
   void _onOutOfBounds(Vector2 position) {
     if (Utils.isPositionOutOfBounds(gameRef.size, position)) {
@@ -161,9 +121,7 @@ class FastBullet extends Bullet {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // _velocity is a unit vector so we need to make it account for the actual
-    // speed.
-    print("FastBullet onLoad called: speed: $_speed");
+
     _velocity = (_velocity)..scaleTo(_speed);
   }
 
@@ -180,20 +138,10 @@ class FastBullet extends Bullet {
   }
 
   @override
-  void onCreate() {
-    super.onCreate();
-    debugPrint("FastBullet onCreate called");
-  }
+  void onDestroy() {}
 
   @override
-  void onDestroy() {
-    debugPrint("FastBullet onDestroy called");
-  }
-
-  @override
-  void onHit(Component other) {
-    debugPrint("FastBullet onHit called");
-  }
+  void onHit(Component other) {}
 }
 
 /// This class creates a slow bullet implementation of the [Bullet] contract and
@@ -245,90 +193,8 @@ class SlowBullet extends Bullet {
   }
 
   @override
-  void onCreate() {
-    super.onCreate();
-    debugPrint("SlowBullet onCreate called");
-  }
+  void onDestroy() {}
 
   @override
-  void onDestroy() {
-    debugPrint("SlowBullet onDestroy called");
-  }
-
-  @override
-  void onHit(Component other) {
-    debugPrint("SlowBullet onHit called");
-  }
-}
-
-/// This is a Factory Method Design pattern example implementation for Bullets
-/// in our game.
-///
-/// The class will return an instance of the specific bullet aksed for based on
-/// a valid bullet choice.
-class BulletFactory {
-  /// private constructor to prevent instantiation
-  BulletFactory._();
-
-  /// main factory method to create instaces of Bullet children
-  static Bullet create(BulletBuildContext context) {
-    Bullet result;
-
-    /// collect all the Bullet definitions here
-    switch (context.bulletType) {
-      case BulletEnum.slowBullet:
-        {
-          if (context.speed != BulletBuildContext.defaultSpeed) {
-            result = SlowBullet.fullInit(context.position, context.velocity,
-                context.size, context.speed, context.health, context.damage);
-          } else {
-            result = SlowBullet(context.position, context.velocity);
-          }
-        }
-        break;
-
-      case BulletEnum.fastBullet:
-        {
-          if (context.speed != BulletBuildContext.defaultSpeed) {
-            result = FastBullet.fullInit(context.position, context.velocity,
-                context.size, context.speed, context.health, context.damage);
-          } else {
-            result = FastBullet(context.position, context.velocity);
-          }
-        }
-        break;
-    }
-
-    ///
-    /// trigger any necessary behavior *before* the instance is handed to the
-    /// caller.
-    result.onCreate();
-
-    return result;
-  }
-}
-
-/// This is a simple data holder for the context data wehen we create a new
-/// Bullet instace through the Factory method using the [BulletFactory]
-///
-/// We have a number of default values here as well in case callers do not
-/// define all the entries.
-class BulletBuildContext {
-  static const double defaultSpeed = 0.0;
-  static const int defaultHealth = 1;
-  static const int defaultDamage = 1;
-  static final Vector2 deaultVelocity = Vector2.zero();
-  static final Vector2 deaultPosition = Vector2(-1, -1);
-  static final Vector2 defaultSize = Vector2.zero();
-  static final BulletEnum defaultBulletType = BulletEnum.values[0];
-
-  double speed = defaultSpeed;
-  Vector2 velocity = deaultVelocity;
-  Vector2 position = deaultPosition;
-  Vector2 size = defaultSize;
-  int health = defaultHealth;
-  int damage = defaultDamage;
-  BulletEnum bulletType = defaultBulletType;
-
-  BulletBuildContext();
+  void onHit(Component other) {}
 }

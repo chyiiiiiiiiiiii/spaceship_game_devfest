@@ -1,36 +1,17 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:spaceship_game/spaceship.dart';
-import 'package:spaceship_game/utils/utils.dart';
+import 'package:spaceship_game/game.dart';
+import 'package:spaceship_game/other/utils.dart';
+import 'package:spaceship_game/space_ship/spaceship.dart';
 
-import './bullet.dart';
-import './command.dart';
-import './main.dart';
+import '../bullet/bullet.dart';
+import '../command/command.dart';
 
-/// Simple enum which will hold enumerated names for all our [Asteroid]-derived
-/// child classes
-///
-/// As you add moreBullet implementation you will add a name hereso that we
-/// can then easly create astroids using the [AsteroidFactory]
-/// The steps are as follows:
-///  - extend the astroid class with a new Asteroid implementation
-///  - add a new enumeration entry
-///  - add a new switch case to the [AsteroidFactory] to create this
-///    new [Asteroid] instance when the enumeration entry is provided.
-enum GameBonusEnum { ufoBonus }
+enum GameBonusEnum {
+  ufoBonus,
+}
 
-// Bullet class is a [PositionComponent] so we get the angle and position of the
-/// element.
-///
-/// This is an abstract class which needs to be extended to use Bullets.
-/// The most important game methods come from [PositionComponent] and are the
-/// update(), onLoad(), amd render() methods that need to be overridden to
-/// drive the behaviour of your Bullet on screen.
-///
-/// You should also overide the abstract methods such as onCreate(),
-/// onDestroy(), and onHit()
-///
 abstract class GameBonus extends PositionComponent
     with CollisionCallbacks, HasGameRef<SpaceshipGame> {
   static const double defaultSpeed = 100.00;
@@ -50,9 +31,6 @@ abstract class GameBonus extends PositionComponent
   // damage that the asteroid does
   late final int? _damage;
 
-  // resolution multiplier
-  late final Vector2 _resolutionMultiplier;
-
   // trigger time in seconds
   late final int _triggerTimeSeconds;
 
@@ -65,7 +43,6 @@ abstract class GameBonus extends PositionComponent
         _health = defaultHealth,
         _damage = defaultDamage,
         _triggerTimeSeconds = triggerTimeSeconds,
-        _resolutionMultiplier = resolutionMultiplier,
         super(
           size: defaultSize,
           position: position,
@@ -82,7 +59,6 @@ abstract class GameBonus extends PositionComponent
         _health = health ?? defaultHealth,
         _damage = damage ?? defaultDamage,
         _triggerTimeSeconds = triggerTimeSeconds,
-        _resolutionMultiplier = resolutionMultiplier,
         super(
           size: size,
           position: position,
@@ -131,9 +107,6 @@ abstract class GameBonus extends PositionComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    /// <todo> collision detection
-    debugPrint("<Game Bonus> <onCollision> detected... $other");
-
     if (other is Bullet) {
       BulletCollisionCommand(other, this).addToController(gameRef.controller);
       GameBonusCollisionCommand(this, other)
@@ -146,6 +119,7 @@ abstract class GameBonus extends PositionComponent
 
     super.onCollision(intersectionPoints, other);
   }
+
   ////////////////////////////////////////////////////////////
   // Helper methods
   //
@@ -203,8 +177,6 @@ class UFOGameBonus extends GameBonus {
     await super.onLoad();
     // _velocity is a unit vector so we need to make it account for the actual
     // speed.
-    debugPrint(
-        "UFOGameBonus onLoad called: speed: $_speed, position: $position, velocity: $_velocity, size: $size");
     _velocity = (_velocity)..scaleTo(_speed);
   }
 
@@ -221,106 +193,11 @@ class UFOGameBonus extends GameBonus {
   }
 
   @override
-  void onCreate() {
-    debugPrint("UFOGameBonus onCreate called");
-  }
+  void onCreate() {}
 
   @override
-  void onDestroy() {
-    debugPrint("UFOGameBonus onDestroy called");
-  }
+  void onDestroy() {}
 
   @override
-  void onHit(PositionComponent other) {
-    debugPrint("UFOGameBonus onHit called");
-  }
-}
-
-/// This is a Factory Method Design pattern example implementation for Asteroids
-/// in our game.
-///
-/// The class will return an instance of the specific asteroid aksed for based
-/// on a valid asteroid type choice.
-class GameBonusFactory {
-  /// private constructor to prevent instantiation
-  GameBonusFactory._();
-
-  /// main factory method to create instaces of Bullet children
-  static GameBonus? create(GameBonusBuildContext context) {
-    GameBonus? result;
-
-    /// collect all the Asteroid definitions here
-    switch (context.gameBonusType) {
-      case GameBonusEnum.ufoBonus:
-        {
-          if (context.size != GameBonusBuildContext.defaultSize) {
-            result = UFOGameBonus.fullInit(
-                context.position,
-                context.velocity,
-                context.size,
-                context.timeTriggerSeconds,
-                context.multiplier,
-                context.speed,
-                context.health,
-                context.damage);
-          } else {
-            result = UFOGameBonus(
-              context.position,
-              context.velocity,
-              context.timeTriggerSeconds,
-              context.multiplier,
-            );
-          }
-        }
-        break;
-    }
-
-    return result;
-  }
-}
-
-/// This is a simple data holder for the context data wehen we create a new
-/// Asteroid instace through the Factory method using the [AsteroidFactory]
-///
-/// We have a number of default values here as well in case callers do not
-/// define all the entries.
-class GameBonusBuildContext {
-  static const double defaultSpeed = 0.0;
-  static const int defaultHealth = 1;
-  static const int defaultDamage = 1;
-  static final Vector2 deaultVelocity = Vector2.zero();
-  static final Vector2 deaultPosition = Vector2(-1, -1);
-  static final Vector2 defaultSize = Vector2.zero();
-  static final Vector2 defaultMultipier = Vector2.all(1.0);
-  static final GameBonusEnum defaultGameBonusType = GameBonusEnum.values[0];
-  static const int defaultTimeTriggerSeconds = 0;
-
-  double speed = defaultSpeed;
-  Vector2 velocity = deaultVelocity;
-  Vector2 position = deaultPosition;
-  Vector2 size = defaultSize;
-  int health = defaultHealth;
-  int damage = defaultDamage;
-  Vector2 multiplier = defaultMultipier;
-  GameBonusEnum gameBonusType = defaultGameBonusType;
-  int timeTriggerSeconds = defaultTimeTriggerSeconds;
-
-  GameBonusBuildContext();
-
-  /// helper method for parsing out strings into corresponding enum values
-  ///
-  static GameBonusEnum gameBonusFromString(String value) {
-    debugPrint('${GameBonusEnum.values}');
-    return GameBonusEnum.values.firstWhere(
-        (e) => e.toString().split('.')[1].toUpperCase() == value.toUpperCase());
-  }
-
-  @override
-
-  /// We are defining our own stringify method so that we can see our
-  /// values when debugging.
-  ///
-  String toString() {
-    return 'name: $gameBonusType , speed: $speed , position: $position , velocity: $velocity, trigger.time: $timeTriggerSeconds , multiplier: $multiplier';
-  }
+  void onHit(PositionComponent other) {}
 }

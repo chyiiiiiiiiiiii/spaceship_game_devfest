@@ -1,31 +1,31 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/game.dart';
 
-import './command.dart';
-import './main.dart';
+import '../command/command.dart';
 
-/// Simple class representing the running scoreboard for the game.
-/// We also have the high-score here to shows the user their best score
-///
+/// 資訊版
 class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   int _highScore = 0;
   int _numOfShotsFired = 0;
   int _score = 0;
   int _livesLeft = 0;
   int _currentLevel = 0;
+
+  /// 遊戲的遊玩時間
   int _timeSinceStartInSeconds = 0;
-  int _timeSinceStartofLevelInSeconds = 0;
+
+  /// 關卡的遊玩時間
+  int _timeSinceStartOfLevelInSeconds = 0;
 
   int beginLives = 0;
   final int _maxLevels;
 
   bool isActive = true;
 
-  //
-  // Number of lives left
   final TextPaint _livesLeftTextPaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.red,
     ),
@@ -35,7 +35,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   // passage of time in seconds
   final TextPaint _passageOfTimePaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.grey,
     ),
@@ -45,7 +45,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   // Score
   final TextPaint _scorePaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.green,
     ),
@@ -55,7 +55,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   // High Score
   final TextPaint _highScorePaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.red,
     ),
@@ -65,7 +65,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   // Score
   final TextPaint _shotsFiredPaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.blue,
     ),
@@ -75,7 +75,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   // Score
   final TextPaint _levelInfoPaint = TextPaint(
     style: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 18.0,
       fontFamily: 'Awesome Font',
       color: Colors.amber,
     ),
@@ -86,7 +86,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
         _livesLeft = livesLeft,
         _currentLevel = currentLevel,
         _maxLevels = maxLevels,
-        super(priority: 100);
+        super(priority: 120);
 
   /// setters
   ///
@@ -107,7 +107,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   set level(int level) {
     if (level > 0) {
       _currentLevel = level;
-      _timeSinceStartofLevelInSeconds = 0;
+      _timeSinceStartOfLevelInSeconds = 0;
     }
   }
 
@@ -127,7 +127,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   }
 
   int get getTimeSinceStartOfLevel {
-    return _timeSinceStartofLevelInSeconds;
+    return _timeSinceStartOfLevelInSeconds;
   }
 
   int get getScore {
@@ -137,9 +137,6 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   int get getHighScore {
     return _highScore;
   }
-
-  /// bussiness methods
-  ///
 
   void addBulletFired() {
     _numOfShotsFired++;
@@ -176,11 +173,11 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     }
 
     _timeSinceStartInSeconds++;
-    _timeSinceStartofLevelInSeconds++;
+    _timeSinceStartOfLevelInSeconds++;
   }
 
   void resetLevelTimer() {
-    _timeSinceStartofLevelInSeconds = 0;
+    _timeSinceStartOfLevelInSeconds = 0;
   }
 
   void progressLevel() {
@@ -197,7 +194,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     _livesLeft = beginLives;
     _currentLevel = 0;
     _timeSinceStartInSeconds = 0;
-    _timeSinceStartofLevelInSeconds = 0;
+    _timeSinceStartOfLevelInSeconds = 0;
 
     isActive = true;
   }
@@ -207,36 +204,34 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
 
   @override
   void render(Canvas canvas) {
-    //
-    // render the number of lives left or 'GAME OVER' if we are out
     _livesLeftTextPaint.render(
       canvas,
       formatNumberOfLives(),
-      Vector2(20, 16),
+      Vector2(18, 16),
     );
 
     //
     // render the angle in radians for reference
     _scorePaint.render(
       canvas,
-      'Score: ${_score.toString()}',
-      Vector2(gameRef.size.x - 100, 16),
+      '目前分數: ${_score.toString()}',
+      Vector2(gameRef.size.x - 120, 16),
     );
 
     //
     // render the angle in radians for reference
     _highScorePaint.render(
       canvas,
-      'High Score: ${_highScore.toString()}',
-      Vector2(gameRef.size.x - 100, 32),
+      '最高分數: ${_highScore.toString()}',
+      Vector2(gameRef.size.x - 120, 48),
     );
 
     //
     // render the angle in radians for reference
     _shotsFiredPaint.render(
       canvas,
-      'Shots Fired: ${_numOfShotsFired.toString()}',
-      Vector2(20, 32),
+      '發射次數: ${_numOfShotsFired.toString()}',
+      Vector2(18, 48),
     );
 
     //
@@ -244,15 +239,15 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     _levelInfoPaint.render(
       canvas,
       formatLevelData(),
-      Vector2(gameRef.size.x - 100, 48),
+      Vector2(gameRef.size.x - 120, 80),
     );
 
     //
     // render the passage of time
     _passageOfTimePaint.render(
       canvas,
-      'Time: $_timeSinceStartInSeconds',
-      Vector2(gameRef.size.x - 100, 64),
+      '遊戲時間: $_timeSinceStartInSeconds',
+      Vector2(gameRef.size.x - 120, 112),
     );
   }
 
@@ -264,28 +259,24 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   String toString() {
     return 'highScore: $_highScore , numOfShotsFired: $_numOfShotsFired , '
         'score: $_score , livesLeft: $_livesLeft, currentLevel: $_currentLevel, '
-        ' time since start: $_timeSinceStartInSeconds, timer for this level: $_timeSinceStartofLevelInSeconds  ';
+        ' time since start: $_timeSinceStartInSeconds, timer for this level: $_timeSinceStartOfLevelInSeconds  ';
   }
 
   /// Helper Methods
   ///
   String formatNumberOfLives() {
     if (_livesLeft > 0) {
-      return 'Lives Left: $_livesLeft';
+      return '剩餘生命: $_livesLeft';
     } else {
-      return "GAME OVER";
+      return "遊戲結束";
     }
   }
 
   String formatLevelData() {
-    String result = '';
-
     if (_currentLevel > 0) {
-      result = 'Level: $_currentLevel';
+      return '關卡: $_currentLevel';
     } else {
-      result = "Level: -";
+      return '';
     }
-
-    return '$result of $_maxLevels';
   }
 }

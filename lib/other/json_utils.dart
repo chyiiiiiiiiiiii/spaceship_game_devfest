@@ -1,40 +1,22 @@
 import 'dart:convert';
 
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
+import 'package:spaceship_game/controller.dart';
+import 'package:spaceship_game/game_bonus/game_bonus_build_context.dart';
 
-import '../controller.dart';
-import '../game_bonus.dart';
-
-///
-/// JSON Utilities for the Asteroids game
-///
-/// Will primarily be used by the Controller to initialize the game
-/// elements and game data such as levels, resolution multiplier etc...
-///
 class JSONUtils {
-  /// read the JSON data from a hardcoded location (for now)
-  ///
+  /// 取得遊戲資訊
   static dynamic readJSONInitData() async {
-    List levels = [];
-    Map<String, dynamic> jsonDataResolution = <String, dynamic>{};
-    List jsonDataLevels = [];
     final String response =
         await rootBundle.loadString('assets/game_config.json');
     final data = await json.decode(response);
-    jsonDataResolution = data["game_data"]["resolution"];
-    jsonDataLevels = data["game_data"]["levels"];
-    debugPrint('{readJSONInitData} <resolution> : $jsonDataResolution');
-    debugPrint(
-        '{readJSONInitData} <levels>: $jsonDataLevels #: ${jsonDataLevels.length}');
-    //_levels = _jsonData["levels"];
+
     return data;
   }
 
-  /// extract the game levels from the dynamic JSON [data]
-  ///
+  /// 從 JSON 取得關卡資料
   static List<GameLevel> extractGameLevels(dynamic data) {
     List<GameLevel> result = List.empty(growable: true);
 
@@ -57,8 +39,6 @@ class JSONUtils {
     return result;
   }
 
-  /// exatract the game resolution from dynamic JSON [data]
-  ///
   static Vector2 extractBaseGameResolution(dynamic data) {
     Vector2 result = Vector2.zero();
     Map jsonDataResolution = {};
@@ -70,15 +50,9 @@ class JSONUtils {
     return result;
   }
 
-  /// Helper Methods
-  ///
-  ///
-
-  /// Map JSON level data to an [AsteroidBuildContext]
-  ///
+  /// 從 JSON 取得隕石資料 [AsteroidBuildContext]
   static List<AsteroidBuildContext> _buildAsteroidData(Map data) {
     List<AsteroidBuildContext> result = List.empty(growable: true);
-    debugPrint('data: $data <length> ${data.length}');
 
     for (final element in data['asteroids']) {
       AsteroidBuildContext asteroid = AsteroidBuildContext();
@@ -96,11 +70,9 @@ class JSONUtils {
     return result;
   }
 
-  /// Map JSON level data to an [AsteroidBuildContext]
-  ///
+  /// 從 JSON 取得獎勵資料 [GameBonusBuildContext]
   static List<GameBonusBuildContext> _buildGameBonusData(Map data) {
     List<GameBonusBuildContext> result = List.empty(growable: true);
-    debugPrint('data: $data <length> ${data.length}');
 
     ///
     /// precondition

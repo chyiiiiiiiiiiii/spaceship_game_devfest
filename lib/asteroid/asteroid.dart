@@ -1,40 +1,19 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceship_game/game.dart';
 
-import '../bullet.dart';
-import '../command.dart';
-import '../main.dart';
-import '../spaceship.dart';
-import '../utils/utils.dart';
+import '../bullet/bullet.dart';
+import '../command/command.dart';
+import '../other/utils.dart';
+import '../space_ship/spaceship.dart';
 
-/// Simple enum which will hold enumerated names for all our [Asteroid]-derived
-/// child classes
-///
-/// As you add moreBullet implementation you will add a name hereso that we
-/// can then easly create astroids using the [AsteroidFactory]
-/// The steps are as follows:
-///  - extend the astroid class with a new Asteroid implementation
-///  - add a new enumeration entry
-///  - add a new switch case to the [AsteroidFactory] to create this
-///    new [Asteroid] instance when the enumeration entry is provided.
 enum AsteroidType {
   largeAsteroid,
   mediumAsteroid,
   smallAsteroid,
 }
 
-// Bullet class is a [PositionComponent] so we get the angle and position of the
-/// element.
-///
-/// This is an abstract class which needs to be extended to use Bullets.
-/// The most important game methods come from [PositionComponent] and are the
-/// update(), onLoad(), amd render() methods that need to be overridden to
-/// drive the behaviour of your Bullet on screen.
-///
-/// You should also overide the abstract methods such as onCreate(),
-/// onDestroy(), and onHit()
-///
 abstract class Asteroid extends PositionComponent
     with CollisionCallbacks, HasGameRef<SpaceshipGame> {
   static const double defaultSpeed = 100.00;
@@ -88,11 +67,9 @@ abstract class Asteroid extends PositionComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    debugPrint("Asteroid - onCollision() - detected... $other");
-
     if (other is Bullet) {
       BulletCollisionCommand(other, this).addToController(gameRef.controller);
-      AsteroidCollisionCommand(this, other).addToController(gameRef.controller);
+      AsteroidCollisionCommand(this).addToController(gameRef.controller);
       UpdateScoreboardScoreCommand(gameRef.controller.getScoreBoard)
           .addToController(gameRef.controller);
     }
@@ -153,8 +130,7 @@ abstract class Asteroid extends PositionComponent
     return List.empty();
   }
 
-  /// Check is the component position is outside the bounds.
-  /// If it's outside, set the new position in the range.
+  /// 取得最新位置，如果超過邊界的話就會從另一頭出現
   Vector2 getNextPosition() {
     return Utils.wrapPosition(gameRef.size, position);
   }
@@ -228,15 +204,7 @@ class SmallAsteroid extends Asteroid {
   }
 
   @override
-  void onCreate() {
-    super.onCreate();
-    debugPrint("SmallAsteroid onCreate called");
-  }
-
-  @override
-  void onDestroy() {
-    debugPrint("SmallAsteroid onDestroy called");
-  }
+  void onDestroy() {}
 
   @override
   void onHit(Component other) {}
@@ -301,21 +269,10 @@ class MediumAsteroid extends Asteroid {
   }
 
   @override
-  void onCreate() {
-    super.onCreate();
-
-    debugPrint("MediumAsteroid onCreate called");
-  }
+  void onDestroy() {}
 
   @override
-  void onDestroy() {
-    debugPrint("MediumAsteroid onDestroy called");
-  }
-
-  @override
-  void onHit(Component other) {
-    debugPrint("MediumAsteroid onHit called");
-  }
+  void onHit(Component other) {}
 
   @override
 
@@ -391,20 +348,10 @@ class LargeAsteroid extends Asteroid {
   }
 
   @override
-  void onCreate() {
-    super.onCreate();
-    debugPrint("LargeAsteroid onCreate called");
-  }
+  void onDestroy() {}
 
   @override
-  void onDestroy() {
-    debugPrint("LargeAsteroid onDestroy called");
-  }
-
-  @override
-  void onHit(Component other) {
-    debugPrint("LargeAsteroid onHit called");
-  }
+  void onHit(Component other) {}
 
   @override
 
