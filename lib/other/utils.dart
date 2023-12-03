@@ -84,10 +84,11 @@ class Utils {
   static bool isPositionOutOfBounds(Vector2 bounds, Vector2 position) {
     bool result = false;
 
-    if (position.x > bounds.x ||
-        position.x < 0 ||
-        position.y < 0 ||
-        position.y > bounds.y) {
+    if (position.x < 0 || position.x > bounds.x) {
+      result = true;
+    }
+
+    if (position.y < 0 || position.y > bounds.y) {
       result = true;
     }
 
