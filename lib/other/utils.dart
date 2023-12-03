@@ -28,13 +28,9 @@ class Utils {
     var randomGenerator = Random();
 
     result = Vector2(
-        randomGenerator
-                .nextInt(screenSize.x.toInt() - 2 * margins.x.toInt())
-                .toDouble() +
+        randomGenerator.nextInt(screenSize.x.toInt() - 2 * margins.x.toInt()).toDouble() +
             margins.x,
-        randomGenerator
-                .nextInt(screenSize.y.toInt() - 2 * margins.y.toInt())
-                .toDouble() +
+        randomGenerator.nextInt(screenSize.y.toInt() - 2 * margins.y.toInt()).toDouble() +
             margins.y);
 
     return result;
@@ -47,8 +43,7 @@ class Utils {
     double velocity;
 
     while (result == Vector2.zero()) {
-      result = Vector2(
-          (randomGenerator.nextInt(3) - 1) * randomGenerator.nextDouble(),
+      result = Vector2((randomGenerator.nextInt(3) - 1) * randomGenerator.nextDouble(),
           (randomGenerator.nextInt(3) - 1) * randomGenerator.nextDouble());
     }
     result.normalize();
@@ -63,8 +58,7 @@ class Utils {
     var randomGenerator = Random();
 
     while (result == Vector2.zero()) {
-      result = Vector2(
-          (randomGenerator.nextInt(3) - 1), (randomGenerator.nextInt(3) - 1));
+      result = Vector2((randomGenerator.nextInt(3) - 1), (randomGenerator.nextInt(3) - 1));
     }
 
     return result;
@@ -80,37 +74,20 @@ class Utils {
     return speed;
   }
 
-  /// 檢查目標物位置是否跑出螢幕邊界
+  /// 是否超出边界
+  /// 需要判断 x 是否超出边界，y 是否超出边界
+  /// 注意，bounds 的 x 和 y 就是 width 和 height
+  /// TODO 实现这个方法
   static bool isPositionOutOfBounds(Vector2 bounds, Vector2 position) {
-    bool result = false;
-
-    if (position.x > bounds.x ||
-        position.x < 0 ||
-        position.y < 0 ||
-        position.y > bounds.y) {
-      result = true;
-    }
-
+    var result = false;
     return result;
   }
 
-  /// 確保物體都在螢幕、畫面內
-  /// 如果超出螢幕，就會從另一端出現
+  /// 如果超出边界，会从另一端出现
+  /// 注意，bounds 的 x 和 y 就是 width 和 height
+  /// TODO 实现这个方法
   static Vector2 wrapPosition(Vector2 bounds, Vector2 position) {
     Vector2 result = position;
-
-    if (position.x >= bounds.x) {
-      result.x = 0;
-    } else if (position.x <= 0) {
-      result.x = bounds.x;
-    }
-
-    if (position.y >= bounds.y) {
-      result.y = 0;
-    } else if (position.y <= 0) {
-      result.y = bounds.y;
-    }
-
     return result;
   }
 
