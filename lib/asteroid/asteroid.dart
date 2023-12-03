@@ -182,25 +182,22 @@ class SmallAsteroid extends Asteroid {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // _velocity is a unit vector so we need to make it account for the actual
-    // speed.
-    _velocity = (_velocity)..scaleTo(_speed);
+    
+    _velocity = (_velocity) * _speed;
   }
 
   @override
+  void update(double dt) {
+    getNextPosition().add(_velocity * dt);
+  }
 
-  /// We will render the asteroid as a ball initially
+  @override
   void render(Canvas canvas) {
     super.render(canvas);
 
     // Draw the circle component
     final localCenter = (scaledSize / 2).toOffset();
     canvas.drawCircle(localCenter, size.x / 2, _paint);
-  }
-
-  @override
-  void update(double dt) {
-    getNextPosition().add(_velocity * dt);
   }
 
   @override

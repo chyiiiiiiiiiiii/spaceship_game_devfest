@@ -126,15 +126,15 @@ class FastBullet extends Bullet {
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawRect(size.toRect(), _paint);
-  }
-
-  @override
   void update(double dt) {
     position.add(_velocity * dt);
     super.update(dt);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    canvas.drawRect(size.toRect(), _paint);
   }
 
   @override

@@ -7,13 +7,13 @@ import '../command/command.dart';
 /// 資訊版
 class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   int _highScore = 0;
-  int _numOfShotsFired = 0;
+  int _shotsCount = 0;
   int _score = 0;
   int _livesLeft = 0;
   int _currentLevel = 0;
 
   /// 遊戲的遊玩時間
-  int _timeSinceStartInSeconds = 0;
+  int _playSeconds = 0;
 
   /// 關卡的遊玩時間
   int _timeSinceStartOfLevelInSeconds = 0;
@@ -88,10 +88,6 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
         _maxLevels = maxLevels,
         super(priority: 120);
 
-  /// setters
-  ///
-  ///
-
   set highScore(int highScore) {
     if (highScore > 0) {
       _highScore = highScore;
@@ -123,7 +119,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   }
 
   int get getTimeSinceStart {
-    return _timeSinceStartInSeconds;
+    return _playSeconds;
   }
 
   int get getTimeSinceStartOfLevel {
@@ -139,12 +135,12 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   }
 
   void addBulletFired() {
-    _numOfShotsFired++;
+    _shotsCount++;
   }
 
   void addBulletsFired(int numOfBullets) {
     if (numOfBullets > 0) {
-      _numOfShotsFired += numOfBullets;
+      _shotsCount += numOfBullets;
     }
   }
 
@@ -172,7 +168,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
       return;
     }
 
-    _timeSinceStartInSeconds++;
+    _playSeconds++;
     _timeSinceStartOfLevelInSeconds++;
   }
 
@@ -189,11 +185,11 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   }
 
   void reset() {
-    _numOfShotsFired = 0;
+    _shotsCount = 0;
     _score = 0;
     _livesLeft = beginLives;
     _currentLevel = 0;
-    _timeSinceStartInSeconds = 0;
+    _playSeconds = 0;
     _timeSinceStartOfLevelInSeconds = 0;
 
     isActive = true;
@@ -230,7 +226,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the angle in radians for reference
     _shotsFiredPaint.render(
       canvas,
-      '發射次數: ${_numOfShotsFired.toString()}',
+      '發射次數: ${_shotsCount.toString()}',
       Vector2(18, 48),
     );
 
@@ -246,7 +242,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the passage of time
     _passageOfTimePaint.render(
       canvas,
-      '遊戲時間: $_timeSinceStartInSeconds',
+      '遊戲時間: $_playSeconds',
       Vector2(gameRef.size.x - 120, 112),
     );
   }
@@ -257,9 +253,9 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   /// values when debugging.
   ///
   String toString() {
-    return 'highScore: $_highScore , numOfShotsFired: $_numOfShotsFired , '
+    return 'highScore: $_highScore , numOfShotsFired: $_shotsCount , '
         'score: $_score , livesLeft: $_livesLeft, currentLevel: $_currentLevel, '
-        ' time since start: $_timeSinceStartInSeconds, timer for this level: $_timeSinceStartOfLevelInSeconds  ';
+        ' time since start: $_playSeconds, timer for this level: $_timeSinceStartOfLevelInSeconds  ';
   }
 
   /// Helper Methods

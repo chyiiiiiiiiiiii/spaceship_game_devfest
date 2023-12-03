@@ -87,16 +87,13 @@ abstract class SpaceShip extends SpriteComponent
     return _muzzleComponent;
   }
 
-  ///////////////////////////////////////////////////////
-  /// Business methods
-  ///
-  ///
-
-  //
-  // Called when the Player has been created.
   void onCreate() {
     anchor = Anchor.center;
+
+    // 設置飛船的體積
     size = Vector2.all(60.0);
+
+    // 新增碰撞邊界
     add(RectangleHitbox());
   }
 
@@ -147,7 +144,9 @@ class SimpleSpaceShip extends SpaceShip {
 
     size.y = size.x;
 
+    // 設置飛船樣貌、外觀
     sprite = await gameRef.loadSprite('asteroids_ship.png');
+    // 飛船的初始位置，在螢幕中間
     position = gameRef.size / 2;
 
     _muzzleComponent.position.x = size.x / 2;
@@ -160,17 +159,25 @@ class SimpleSpaceShip extends SpaceShip {
   void update(double dt) {
     final isUsingJoystick = !_joystick.delta.isZero();
     final joystickAngle = _joystick.delta.screenAngle();
+
+    // 檢查現在是否使用搖桿操作飛船
     if (isUsingJoystick) {
+      // 更新飛船位置，透過 delta 和速度去計算出一幀的移動量，添加新的移動距離
       getNextPosition().add(_joystick.relativeDelta * _maxSpeed * dt);
+
+      // 更新飛船角度，根據搖桿的角度
       angle = joystickAngle;
 
       return;
     }
 
+    // 檢查現在是否使用鍵盤操作飛船
     final isUsingKeyboard = !gameRef.keyboardDirection.isZero();
     if (isUsingKeyboard) {
+      // 更新飛船位置，透過 delta 和速度去計算出一幀的移動量，添加新的移動距離
       getNextPosition().add(gameRef.keyboardDirection * _maxSpeed * dt);
 
+      // 更新飛船角度，根據鍵盤方向鍵的按壓去判斷飛船的角度
       final keyboardAngle = gameRef.keyboardDirection.screenAngle();
       angle = keyboardAngle + joystickAngle;
 
