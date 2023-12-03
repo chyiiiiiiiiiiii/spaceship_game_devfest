@@ -10,8 +10,8 @@ class AsteroidBuildContext {
   static const double defaultSpeed = 0.0;
   static const int defaultHealth = 1;
   static const int defaultDamage = 1;
-  static final Vector2 deaultVelocity = Vector2.zero();
-  static final Vector2 deaultPosition = Vector2(-1, -1);
+  static final Vector2 defaultVelocity = Vector2.zero();
+  static final Vector2 defaultPosition = Vector2(-1, -1);
   static final Vector2 defaultSize = Vector2.zero();
   static final AsteroidType defaultAsteroidType = AsteroidType.values[0];
   static final Vector2 defaultMultiplier = Vector2.all(1.0);
@@ -24,8 +24,8 @@ class AsteroidBuildContext {
   }
 
   double speed = defaultSpeed;
-  Vector2 velocity = deaultVelocity;
-  Vector2 position = deaultPosition;
+  Vector2 velocity = defaultVelocity;
+  Vector2 position = defaultPosition;
   Vector2 size = defaultSize;
   int health = defaultHealth;
   int damage = defaultDamage;
