@@ -18,16 +18,11 @@ class SpaceshipGame extends FlameGame
   Future<void> onLoad() async {
     await super.onLoad();
 
-    /// initialize resources
     loadResources();
 
-    /// Add a Controller to the game
     controller = Controller();
     add(controller);
 
-    /// note that we use 'await' which will wait to load the data before any
-    /// of the other code continues this way we know that out Controller's state
-    /// data is correct.
     await controller.init();
   }
 
