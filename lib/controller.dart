@@ -12,6 +12,7 @@ import 'package:spaceship_game/asteroid/asteroid_factory.dart';
 import 'package:spaceship_game/game.dart';
 import 'package:spaceship_game/game_bonus/game_bonus_build_context.dart';
 import 'package:spaceship_game/game_bonus/game_bonus_factory.dart';
+import 'package:spaceship_game/other/utils.dart';
 import 'package:spaceship_game/space_ship/space_ship_build_context.dart';
 import 'package:spaceship_game/space_ship/space_ship_factory.dart';
 
@@ -63,7 +64,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// The SpaceShip being controlled by Joystick
   ///
-  late SpaceShip player;
+  late SpaceShip spaceShip;
 
   /// Parallax image assets
   ///
@@ -89,7 +90,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   }
 
   SpaceShip getSpaceship() {
-    return player;
+    return spaceShip;
   }
 
   Images getGameImages() {
@@ -172,7 +173,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     super.update(dt);
 
     /// 更新視差背景
-    if (children.contains(player)) {
+    if (children.contains(spaceShip)) {
       parallax.parallax?.baseVelocity =
           (gameRef.keyboardDirection + _joystick.relativeDelta) * 200;
     } else {
@@ -190,7 +191,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       ),
     ).render(
       canvas,
-      '(使用"方向鍵"操控)',
+      '(可使用"方向键"操控)',
       Vector2(gameRef.size.x - 180, gameRef.size.y - 60),
     );
   }
@@ -319,8 +320,18 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       // load the asteroid elements
       //
       for (var asteroid in _gameLevels[_currentGameLevelIndex].asteroidConfig) {
-        // add the multiplier to the asteroid context
-        asteroid.multiplier = _resolutionMultiplier;
+        // 帮陨石生成一个随机的出现位置
+        asteroid.position =
+            Utils.generateRandomPosition(screenSize: gameRef.size);
+
+        /// 如果陨石生成的位置很靠近飞船，需要调整陨石的位置到远一点的地方，避免一开始就互相碰撞
+        /// 注意，可以从 asteroid.position 存取陨石的位置，从 spaceShip.position 存取飞船的位置
+        /// 从 gameRef.size.x 取得萤幕宽度，从 gameRef.size.y 取得萤幕高度
+        /// 透过 Vector2 的 distanceTo() 计算距离
+        /// 两者需进行距离计算，如果距离 300 pixel 以内，就更新 asteroid.position 到画面边缘
+        /// 在一个函数里解决
+        /// TODO 实现这个功能
+        
 
         // create each asteroid
         Asteroid newAsteroid = AsteroidFactory.create(asteroid);
@@ -345,8 +356,8 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     SpaceShipBuildContext context = SpaceShipBuildContext()
       ..spaceShipType = SpaceShipEnum.simpleSpaceShip
       ..joystick = _joystick;
-    player = SpaceShipFactory.create(context);
-    add(player);
+    spaceShip = SpaceShipFactory.create(context);
+    add(spaceShip);
   }
 
   /// 檢查目前關卡是否完成了

@@ -22,16 +22,26 @@ class Utils {
     return randomVector()..scale(movePixels);
   }
 
-  /// 隨機生成一個位置
-  static Vector2 generateRandomPosition(Vector2 screenSize, Vector2 margins) {
+  /// 随机生成一个位置
+  static Vector2 generateRandomPosition({
+    required Vector2 screenSize,
+    Vector2? margins,
+  }) {
     var result = Vector2.zero();
     var randomGenerator = Random();
 
+    final marginX = (margins?.x ?? 0);
+    final marginY = (margins?.y ?? 0);
+
     result = Vector2(
-        randomGenerator.nextInt(screenSize.x.toInt() - 2 * margins.x.toInt()).toDouble() +
-            margins.x,
-        randomGenerator.nextInt(screenSize.y.toInt() - 2 * margins.y.toInt()).toDouble() +
-            margins.y);
+        randomGenerator
+                .nextInt(screenSize.x.toInt() - 2 * marginX.toInt())
+                .toDouble() +
+            marginX,
+        randomGenerator
+                .nextInt(screenSize.y.toInt() - 2 * marginY.toInt())
+                .toDouble() +
+            marginY);
 
     return result;
   }
@@ -80,6 +90,7 @@ class Utils {
   /// TODO 实现这个方法
   static bool isPositionOutOfBounds(Vector2 bounds, Vector2 position) {
     var result = false;
+
     return result;
   }
 
@@ -88,6 +99,7 @@ class Utils {
   /// TODO 实现这个方法
   static Vector2 wrapPosition(Vector2 bounds, Vector2 position) {
     Vector2 result = position;
+    
     return result;
   }
 

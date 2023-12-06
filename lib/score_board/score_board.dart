@@ -57,7 +57,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     style: const TextStyle(
       fontSize: 18.0,
       fontFamily: 'Awesome Font',
-      color: Colors.red,
+      color: Colors.blueAccent,
     ),
   );
 
@@ -210,7 +210,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the angle in radians for reference
     _scorePaint.render(
       canvas,
-      '目前分數: ${_score.toString()}',
+      '目前分数: ${_score.toString()}',
       Vector2(gameRef.size.x - 120, 16),
     );
 
@@ -218,7 +218,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the angle in radians for reference
     _highScorePaint.render(
       canvas,
-      '最高分數: ${_highScore.toString()}',
+      '最高分数: ${_highScore.toString()}',
       Vector2(gameRef.size.x - 120, 48),
     );
 
@@ -226,7 +226,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the angle in radians for reference
     _shotsFiredPaint.render(
       canvas,
-      '發射次數: ${_shotsCount.toString()}',
+      '发射次数: ${_shotsCount.toString()}',
       Vector2(18, 48),
     );
 
@@ -242,7 +242,7 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
     // render the passage of time
     _passageOfTimePaint.render(
       canvas,
-      '遊戲時間: $_playSeconds',
+      '游戏时间: $_playSeconds',
       Vector2(gameRef.size.x - 120, 112),
     );
   }
@@ -262,15 +262,15 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   ///
   String formatNumberOfLives() {
     if (_livesLeft > 0) {
-      return '剩餘生命: $_livesLeft';
+      return '剩余生命: $_livesLeft';
     } else {
-      return "遊戲結束";
+      return "游戏结束";
     }
   }
 
   String formatLevelData() {
     if (_currentLevel > 0) {
-      return '關卡: $_currentLevel';
+      return '关卡: $_currentLevel';
     } else {
       return '';
     }
