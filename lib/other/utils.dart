@@ -22,20 +22,26 @@ class Utils {
     return randomVector()..scale(movePixels);
   }
 
-  /// 隨機生成一個位置
-  static Vector2 generateRandomPosition(Vector2 screenSize, Vector2 margins) {
+  /// 随机生成一个位置
+  static Vector2 generateRandomPosition({
+    required Vector2 screenSize,
+    Vector2? margins,
+  }) {
     var result = Vector2.zero();
     var randomGenerator = Random();
 
+    final marginX = (margins?.x ?? 0);
+    final marginY = (margins?.y ?? 0);
+
     result = Vector2(
         randomGenerator
-                .nextInt(screenSize.x.toInt() - 2 * margins.x.toInt())
+                .nextInt(screenSize.x.toInt() - 2 * marginX.toInt())
                 .toDouble() +
-            margins.x,
+            marginX,
         randomGenerator
-                .nextInt(screenSize.y.toInt() - 2 * margins.y.toInt())
+                .nextInt(screenSize.y.toInt() - 2 * marginY.toInt())
                 .toDouble() +
-            margins.y);
+            marginY);
 
     return result;
   }

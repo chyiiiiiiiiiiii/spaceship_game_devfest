@@ -160,24 +160,24 @@ class SimpleSpaceShip extends SpaceShip {
     final isUsingJoystick = !_joystick.delta.isZero();
     final joystickAngle = _joystick.delta.screenAngle();
 
-    // 檢查現在是否使用搖桿操作飛船
+    // 检查现在是否使用摇杆操作飞船
     if (isUsingJoystick) {
-      // 更新飛船位置，透過 delta 和速度去計算出一幀的移動量，添加新的移動距離
+      // 更新飞船位置，透过 delta 和速度去计算出一帧的移动量，添加新的移动距离
       getNextPosition().add(_joystick.relativeDelta * _maxSpeed * dt);
 
-      // 更新飛船角度，根據搖桿的角度
+      // 更新飞船角度，根据摇杆的角度
       angle = joystickAngle;
 
       return;
     }
 
-    // 檢查現在是否使用鍵盤操作飛船
+    // 检查现在是否使用键盘操作飞船
     final isUsingKeyboard = !gameRef.keyboardDirection.isZero();
     if (isUsingKeyboard) {
-      // 更新飛船位置，透過 delta 和速度去計算出一幀的移動量，添加新的移動距離
+      // 更新飞船位置，透过 delta 和速度去计算出一帧的移动量，添加新的移动距离
       getNextPosition().add(gameRef.keyboardDirection * _maxSpeed * dt);
 
-      // 更新飛船角度，根據鍵盤方向鍵的按壓去判斷飛船的角度
+      // 更新飞船角度，根据键盘方向键的按压去判断飞船的角度
       final keyboardAngle = gameRef.keyboardDirection.screenAngle();
       angle = keyboardAngle + joystickAngle;
 

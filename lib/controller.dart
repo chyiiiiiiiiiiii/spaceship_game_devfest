@@ -12,6 +12,7 @@ import 'package:spaceship_game/asteroid/asteroid_factory.dart';
 import 'package:spaceship_game/game.dart';
 import 'package:spaceship_game/game_bonus/game_bonus_build_context.dart';
 import 'package:spaceship_game/game_bonus/game_bonus_factory.dart';
+import 'package:spaceship_game/other/utils.dart';
 import 'package:spaceship_game/space_ship/space_ship_build_context.dart';
 import 'package:spaceship_game/space_ship/space_ship_factory.dart';
 
@@ -63,7 +64,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// The SpaceShip being controlled by Joystick
   ///
-  late SpaceShip player;
+  late SpaceShip spaceShip;
 
   /// Parallax image assets
   ///
@@ -89,7 +90,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   }
 
   SpaceShip getSpaceship() {
-    return player;
+    return spaceShip;
   }
 
   Images getGameImages() {
@@ -172,7 +173,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     super.update(dt);
 
     /// 更新視差背景
-    if (children.contains(player)) {
+    if (children.contains(spaceShip)) {
       parallax.parallax?.baseVelocity =
           (gameRef.keyboardDirection + _joystick.relativeDelta) * 200;
     } else {
@@ -190,7 +191,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       ),
     ).render(
       canvas,
-      '(使用"方向鍵"操控)',
+      '(可使用"方向键"操控)',
       Vector2(gameRef.size.x - 180, gameRef.size.y - 60),
     );
   }
@@ -319,8 +320,20 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
       // load the asteroid elements
       //
       for (var asteroid in _gameLevels[_currentGameLevelIndex].asteroidConfig) {
-        // add the multiplier to the asteroid context
-        asteroid.multiplier = _resolutionMultiplier;
+        // 帮陨石生成一个随机的出现位置
+        asteroid.position =
+            Utils.generateRandomPosition(screenSize: gameRef.size);
+
+        // 飞船的位置
+        var spaceShipPosition = spaceShip.position;
+
+        // 检查陨石跟飞船的距离，如果太近就把陨石往外推，避免玩家刚开始就被砸到
+        final distance = asteroid.position.distanceTo(spaceShipPosition);
+
+        // 如果距离 200 pixel 以内，就帮陨石的位置加上 200 pixel
+        if (distance < 200) {
+          asteroid.position.add(Vector2(200, 200));
+        }
 
         // create each asteroid
         Asteroid newAsteroid = AsteroidFactory.create(asteroid);
@@ -345,8 +358,8 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     SpaceShipBuildContext context = SpaceShipBuildContext()
       ..spaceShipType = SpaceShipEnum.simpleSpaceShip
       ..joystick = _joystick;
-    player = SpaceShipFactory.create(context);
-    add(player);
+    spaceShip = SpaceShipFactory.create(context);
+    add(spaceShip);
   }
 
   /// 檢查目前關卡是否完成了
