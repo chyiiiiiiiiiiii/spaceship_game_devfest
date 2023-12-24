@@ -1,4 +1,4 @@
-# 亲子AI编程星际之旅
+# Spaceship Game 亲子AI编程星际之旅
 
 This project is the topic for DevFest Shanghai 2023. Talk about the game component and let the attendees implement some features. Enjoy the game development.
 
@@ -6,13 +6,16 @@ I put the project in Zapp online IDE. It helps us to share the project to everyo
 
 [Details](https://github.com/chyiiiiiiiiiiii/presentations-and-slides/tree/main/Google%20DevFest%20Shanghai%202023%20part2)
 
+## Environment
+- flame v1.13.1
+
 ## Features
 - [x] 👆🏻 Use `TapDetector` to tap for shooting the bullet
 - [x] 🕹️ Use `JoystickComponent` to control the spaceship
 - [x] ⌨️ Use `KeyboardEvents` to control the spaceship
 - [x] ⏱️ Use `TimerComponent` to calculate the time goes.
 - [x] 💥 Use `CollisionCallbacks` and `HitBox` for components touching
-- [x] 📷 Use `Camera` for shaking effect with explosion
+- [x] 📷 Use `CameraComponent` and `flame_noise` package for shaking effect with explosion
 - [x] 🎇 Use `ParticleSystemComponent` for destroy effect
 - [x] 🔊 Use `FlameAudio` to play sound for shooting and explosion
 - [x] Use `ParallaxComponent` effect to feel the moving

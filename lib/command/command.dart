@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:flame_noise/flame_noise.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spaceship_game/asteroid/asteroid_build_context.dart';
 import 'package:spaceship_game/asteroid/asteroid_factory.dart';
@@ -440,7 +442,15 @@ class PlayerCollisionCommand extends Command {
       targetPlayer.onDestroy();
       FlameAudio.play('missile_hit.wav', volume: 0.7);
       // render the camera shake effect for a short duration
-      _getController().gameRef.camera.shake(intensity: 20);
+      _getController().gameRef.camera.viewfinder.add(
+            MoveEffect.by(
+              Vector2(10, 10),
+              PerlinNoiseEffectController(
+                duration: 0.5,
+                frequency: 400,
+              ),
+            ),
+          );
 
       // remove the bullet from the game
       _getController().remove(targetPlayer);
