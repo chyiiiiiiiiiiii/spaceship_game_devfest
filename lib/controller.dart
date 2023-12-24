@@ -366,7 +366,7 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// check if the current level is done.
   ///
-  /// We also add a'barrier' of a couple seconds to pause teh level generation
+  /// We also add a barrier of a couple seconds to pause teh level generation
   /// so that the player has a few seconds in between levels
   ///
   bool shouldCreatePlayer() {
