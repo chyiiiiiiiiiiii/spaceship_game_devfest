@@ -1,5 +1,4 @@
 import 'package:flame/events.dart';
-import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,7 @@ import './controller.dart';
 import 'command/command.dart';
 
 class SpaceshipGame extends FlameGame
-    with DragCallbacks, TapDetector, HasCollisionDetection, KeyboardEvents {
+    with TapDetector, HasCollisionDetection, KeyboardEvents {
   /// 管理者，掌握遊戲內的元件與操作
   late final Controller controller;
 
