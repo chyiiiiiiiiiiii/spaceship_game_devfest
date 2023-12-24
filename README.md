@@ -21,3 +21,7 @@ First, Sign in Github account, and fork the project. Then you can start your own
 ## Demo
 ![](./demo/demo.gif)
 ![](./demo/demo_2.gif)
+
+---
+
+Shout out to Piotr Paweska. Thanks for the great course to help developers learn Flame.
