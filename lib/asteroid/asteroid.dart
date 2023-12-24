@@ -33,16 +33,12 @@ abstract class Asteroid extends PositionComponent
   // damage that the asteroid does
   late final int? _damage;
 
-  // resolution multiplier
-  late final Vector2 _resolutionMultiplier;
-
   //
   // default constructor with default values
-  Asteroid(Vector2 position, Vector2 velocity, Vector2 resolutionMultiplier)
+  Asteroid(Vector2 position, Vector2 velocity)
       : _velocity = velocity.normalized(),
         _health = defaultHealth,
         _damage = defaultDamage,
-        _resolutionMultiplier = resolutionMultiplier,
         super(
           size: defaultSize,
           position: position,
@@ -51,11 +47,9 @@ abstract class Asteroid extends PositionComponent
 
   //
   // named constructor
-  Asteroid.fullInit(
-      Vector2 position, Vector2 velocity, Vector2 resolutionMultiplier,
+  Asteroid.fullInit(Vector2 position, Vector2 velocity,
       {Vector2? size, double? speed, int? health, int? damage})
-      : _resolutionMultiplier = resolutionMultiplier,
-        _velocity = velocity.normalized(),
+      : _velocity = velocity.normalized(),
         _speed = speed ?? defaultSpeed,
         _health = health ?? defaultHealth,
         _damage = damage ?? defaultDamage,
@@ -141,7 +135,7 @@ abstract class Asteroid extends PositionComponent
   /// values when debugging.
   ///
   String toString() {
-    return 'speed: $_speed , position: $position , velocity: $_velocity, multiplier: $_resolutionMultiplier';
+    return 'speed: $_speed , position: $position , velocity: $_velocity';
   }
 }
 
@@ -157,9 +151,8 @@ class SmallAsteroid extends Asteroid {
   static final Vector2 defaultSize = Vector2.all(24);
   static final _paint = Paint()..color = Colors.green;
 
-  SmallAsteroid(
-      Vector2 position, Vector2 velocity, Vector2 resolutionMultiplier)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+  SmallAsteroid(Vector2 position, Vector2 velocity)
+      : super.fullInit(position, velocity,
             speed: defaultSpeed,
             health: Asteroid.defaultHealth,
             damage: Asteroid.defaultDamage,
@@ -173,7 +166,7 @@ class SmallAsteroid extends Asteroid {
       double? speed,
       int? health,
       int? damage)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+      : super.fullInit(position, velocity,
             size: size,
             speed: speed ?? defaultSpeed,
             health: health,
@@ -182,7 +175,7 @@ class SmallAsteroid extends Asteroid {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    
+
     _velocity = (_velocity) * _speed;
   }
 
@@ -220,9 +213,8 @@ class MediumAsteroid extends Asteroid {
 
   static final _paint = Paint()..color = Colors.blue;
 
-  MediumAsteroid(
-      Vector2 position, Vector2 velocity, Vector2 resolutionMultiplier)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+  MediumAsteroid(Vector2 position, Vector2 velocity)
+      : super.fullInit(position, velocity,
             speed: defaultSpeed,
             health: Asteroid.defaultHealth,
             damage: Asteroid.defaultDamage,
@@ -236,7 +228,7 @@ class MediumAsteroid extends Asteroid {
       double? speed,
       int? health,
       int? damage)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+      : super.fullInit(position, velocity,
             size: size,
             speed: speed ?? defaultSpeed,
             health: health,
@@ -292,23 +284,16 @@ class LargeAsteroid extends Asteroid {
   static final Vector2 defaultSize = Vector2.all(48);
   static final _paint = Paint()..color = Colors.red;
 
-  LargeAsteroid(
-      Vector2 position, Vector2 velocity, Vector2 resolutionMultiplier)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+  LargeAsteroid(Vector2 position, Vector2 velocity)
+      : super.fullInit(position, velocity,
             speed: defaultSpeed,
             health: Asteroid.defaultHealth,
             damage: Asteroid.defaultDamage,
             size: defaultSize);
 
-  LargeAsteroid.fullInit(
-      Vector2 position,
-      Vector2 velocity,
-      Vector2 resolutionMultiplier,
-      Vector2? size,
-      double? speed,
-      int? health,
-      int? damage)
-      : super.fullInit(position, velocity, resolutionMultiplier,
+  LargeAsteroid.fullInit(Vector2 position, Vector2 velocity, Vector2? size,
+      double? speed, int? health, int? damage)
+      : super.fullInit(position, velocity,
             size: size,
             speed: speed ?? defaultSpeed,
             health: health,

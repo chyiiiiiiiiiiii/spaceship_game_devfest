@@ -28,8 +28,7 @@ class AsteroidFactory {
                 context.health,
                 context.damage);
           } else {
-            result = SmallAsteroid(
-                context.position, context.velocity, context.multiplier);
+            result = SmallAsteroid(context.position, context.velocity);
           }
         }
         break;
@@ -46,8 +45,7 @@ class AsteroidFactory {
                 context.health,
                 context.damage);
           } else {
-            result = MediumAsteroid(
-                context.position, context.velocity, context.multiplier);
+            result = MediumAsteroid(context.position, context.velocity);
           }
         }
         break;
@@ -55,17 +53,10 @@ class AsteroidFactory {
       case AsteroidType.largeAsteroid:
         {
           if (context.size != AsteroidBuildContext.defaultSize) {
-            result = LargeAsteroid.fullInit(
-                context.position,
-                context.velocity,
-                context.multiplier,
-                context.size,
-                context.speed,
-                context.health,
-                context.damage);
+            result = LargeAsteroid.fullInit(context.position, context.velocity,
+                context.size, context.speed, context.health, context.damage);
           } else {
-            result = LargeAsteroid(
-                context.position, context.velocity, context.multiplier);
+            result = LargeAsteroid(context.position, context.velocity);
           }
         }
         break;

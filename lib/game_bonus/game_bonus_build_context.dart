@@ -8,7 +8,6 @@ class GameBonusBuildContext {
   static final Vector2 defaultVelocity = Vector2.zero();
   static final Vector2 defaultPosition = Vector2(-1, -1);
   static final Vector2 defaultSize = Vector2.zero();
-  static final Vector2 defaultMultiplier = Vector2.all(1.0);
   static final GameBonusEnum defaultGameBonusType = GameBonusEnum.values[0];
   static const int defaultTimeTriggerSeconds = 0;
 
@@ -18,7 +17,6 @@ class GameBonusBuildContext {
   Vector2 size = defaultSize;
   int health = defaultHealth;
   int damage = defaultDamage;
-  Vector2 multiplier = defaultMultiplier;
   GameBonusEnum gameBonusType = defaultGameBonusType;
   int timeTriggerSeconds = defaultTimeTriggerSeconds;
 
@@ -33,6 +31,6 @@ class GameBonusBuildContext {
 
   @override
   String toString() {
-    return 'name: $gameBonusType , speed: $speed , position: $position , velocity: $velocity, trigger.time: $timeTriggerSeconds , multiplier: $multiplier';
+    return 'name: $gameBonusType , speed: $speed , position: $position , velocity: $velocity, trigger.time: $timeTriggerSeconds ';
   }
 }

@@ -1,5 +1,5 @@
-import 'package:spaceship_game/space_ship/spaceship.dart';
 import 'package:spaceship_game/space_ship/space_ship_build_context.dart';
+import 'package:spaceship_game/space_ship/spaceship.dart';
 
 class SpaceShipFactory {
   SpaceShipFactory._();
@@ -12,15 +12,10 @@ class SpaceShipFactory {
       case SpaceShipEnum.simpleSpaceShip:
         {
           if (context.speed != SpaceShipBuildContext.defaultSpeed) {
-            result = SimpleSpaceShip.fullInit(
-                context.multiplier,
-                context.joystick,
-                context.size,
-                context.speed,
-                context.health,
-                context.damage);
+            result = SimpleSpaceShip.fullInit(context.joystick, context.size,
+                context.speed, context.health, context.damage);
           } else {
-            result = SimpleSpaceShip(context.position, context.joystick);
+            result = SimpleSpaceShip(context.joystick);
           }
         }
         break;

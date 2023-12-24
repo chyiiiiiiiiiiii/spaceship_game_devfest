@@ -19,11 +19,7 @@ class SpaceshipGame extends FlameGame
     await super.onLoad();
 
     loadResources();
-
-    controller = Controller();
-    add(controller);
-
-    await controller.init();
+    await addGameController();
   }
 
   @override
@@ -80,5 +76,12 @@ class SpaceshipGame extends FlameGame
   /// Cache and preload the assets
   void loadResources() async {
     await images.load('boom.png');
+  }
+
+  Future<void> addGameController() async {
+    controller = Controller();
+    add(controller);
+
+    await controller.init();
   }
 }

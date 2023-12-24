@@ -16,7 +16,7 @@ abstract class Bullet extends PositionComponent
   static const double defaultSpeed = 100.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;
-  static final Vector2 defaultSize = Vector2.all(3.0);
+  static final Vector2 defaultSize = Vector2.all(6.0);
 
   // velocity vector for the bullet.
   late Vector2 _velocity;
@@ -100,7 +100,7 @@ abstract class Bullet extends PositionComponent
 ///
 class FastBullet extends Bullet {
   static const double defaultSpeed = 175.00;
-  static final Vector2 defaultSize = Vector2.all(2.00);
+  static final Vector2 defaultSize = Vector2.all(6.00);
   // color of the bullet
   static final _paint = Paint()..color = Colors.green;
 
@@ -153,7 +153,7 @@ class FastBullet extends Bullet {
 ///
 class SlowBullet extends Bullet {
   static const double defaultSpeed = 50.00;
-  static final Vector2 defaultSize = Vector2.all(4.0);
+  static final Vector2 defaultSize = Vector2.all(6.0);
   // color of the bullet
   static final _paint = Paint()..color = Colors.red;
 

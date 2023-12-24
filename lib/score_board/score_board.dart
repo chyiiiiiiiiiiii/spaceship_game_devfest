@@ -19,7 +19,6 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
   int _timeSinceStartOfLevelInSeconds = 0;
 
   int beginLives = 0;
-  final int _maxLevels;
 
   bool isActive = true;
 
@@ -85,7 +84,6 @@ class ScoreBoard extends PositionComponent with HasGameRef<SpaceshipGame> {
       : beginLives = livesLeft,
         _livesLeft = livesLeft,
         _currentLevel = currentLevel,
-        _maxLevels = maxLevels,
         super(priority: 120);
 
   set highScore(int highScore) {

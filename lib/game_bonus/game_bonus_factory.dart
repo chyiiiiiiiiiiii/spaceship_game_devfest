@@ -16,7 +16,6 @@ class GameBonusFactory {
                 context.velocity,
                 context.size,
                 context.timeTriggerSeconds,
-                context.multiplier,
                 context.speed,
                 context.health,
                 context.damage);
@@ -25,7 +24,6 @@ class GameBonusFactory {
               context.position,
               context.velocity,
               context.timeTriggerSeconds,
-              context.multiplier,
             );
           }
         }

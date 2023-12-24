@@ -17,9 +17,6 @@ abstract class SpaceShip extends SpriteComponent
   static const int defaultHealth = 1;
   static final defaultSize = Vector2.all(5.0);
 
-  // velocity vector for the asteroid.
-  late Vector2 _velocity;
-
   // speed of the asteroid
   late double _speed;
 
@@ -29,8 +26,6 @@ abstract class SpaceShip extends SpriteComponent
   // damage that the asteroid does
   late final int? _damage;
 
-  // resolution multiplier
-  late final Vector2 _resolutionMultiplier;
 
   /// Pixels/s
   late final double _maxSpeed = defaultMaxSpeed;
@@ -52,10 +47,9 @@ abstract class SpaceShip extends SpriteComponent
 
   //
   // default constructor with default values
-  SpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
+  SpaceShip(JoystickComponent joystick)
       : _health = defaultHealth,
         _damage = defaultDamage,
-        _resolutionMultiplier = resolutionMultiplier,
         _joystick = joystick,
         super(
           size: defaultSize,
@@ -64,10 +58,9 @@ abstract class SpaceShip extends SpriteComponent
 
   //
   // named constructor
-  SpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent joystick,
+  SpaceShip.fullInit(JoystickComponent joystick,
       {Vector2? size, double? speed, int? health, int? damage})
-      : _resolutionMultiplier = resolutionMultiplier,
-        _joystick = joystick,
+      : _joystick = joystick,
         _speed = speed ?? defaultSpeed,
         _health = health ?? defaultHealth,
         _damage = damage ?? defaultDamage,
@@ -108,19 +101,12 @@ abstract class SpaceShip extends SpriteComponent
   }
 }
 
-/// This class creates a fast bullet implementation of the [Bullet] contract and
-/// renders the bullet as a simple green square.
-/// Speed has been defaulted to 150 p/s but can be changed through the
-/// constructor. It is set with a damage of 1 which is the lowest damage and
-/// with health of 1 which means that it will be destroyed on impact since it
-/// is also the lowest health you can have.
-///
 class SimpleSpaceShip extends SpaceShip {
   static const double defaultSpeed = 300.00;
   static final Vector2 defaultSize = Vector2.all(2.00);
 
-  SimpleSpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
-      : super.fullInit(resolutionMultiplier, joystick,
+  SimpleSpaceShip( JoystickComponent joystick)
+      : super.fullInit(joystick,
             size: defaultSize,
             speed: defaultSpeed,
             health: SpaceShip.defaultHealth,
@@ -129,13 +115,12 @@ class SimpleSpaceShip extends SpaceShip {
   //
   // named constructor
   SimpleSpaceShip.fullInit(
-      Vector2 resolutionMultiplier,
       JoystickComponent joystick,
       Vector2? size,
       double? speed,
       int? health,
       int? damage)
-      : super.fullInit(resolutionMultiplier, joystick,
+      : super.fullInit(joystick,
             size: size, speed: speed, health: health, damage: damage);
 
   @override
@@ -151,7 +136,6 @@ class SimpleSpaceShip extends SpaceShip {
 
     _muzzleComponent.position.x = size.x / 2;
     _muzzleComponent.position.y = size.y / 10;
-
     add(_muzzleComponent);
   }
 

@@ -9,7 +9,6 @@ class SpaceShipBuildContext {
   static final Vector2 defaultPosition = Vector2(-1, -1);
   static final Vector2 defaultSize = Vector2.zero();
   static final SpaceShipEnum defaultSpaceShipType = SpaceShipEnum.values[0];
-  static final Vector2 defaultMultiplier = Vector2.all(1.0);
 
   /// helper method for parsing out strings into corresponding enum values
   ///
@@ -24,7 +23,6 @@ class SpaceShipBuildContext {
   Vector2 size = defaultSize;
   int health = defaultHealth;
   int damage = defaultDamage;
-  Vector2 multiplier = defaultMultiplier;
   SpaceShipEnum spaceShipType = defaultSpaceShipType;
   late JoystickComponent joystick;
 
@@ -36,6 +34,6 @@ class SpaceShipBuildContext {
   /// values when debugging.
   ///
   String toString() {
-    return 'name: $spaceShipType , speed: $speed , position: $position , velocity: $velocity, multiplier: $multiplier';
+    return 'name: $spaceShipType , speed: $speed , position: $position , velocity: $velocity';
   }
 }

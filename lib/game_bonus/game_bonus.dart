@@ -36,9 +36,11 @@ abstract class GameBonus extends PositionComponent
 
   //
   // default constructor with default values
-  GameBonus(Vector2 position, Vector2 velocity, int triggerTimeSeconds,
-      Vector2 resolutionMultiplier)
-      : _velocity = velocity.normalized(),
+  GameBonus(
+    Vector2 position,
+    Vector2 velocity,
+    int triggerTimeSeconds,
+  )   : _velocity = velocity.normalized(),
         _speed = defaultSpeed,
         _health = defaultHealth,
         _damage = defaultDamage,
@@ -52,7 +54,6 @@ abstract class GameBonus extends PositionComponent
   //
   // named constructor
   GameBonus.fullInit(Vector2 position, Vector2 velocity, int triggerTimeSeconds,
-      Vector2 resolutionMultiplier,
       {Vector2? size, double? speed, int? health, int? damage})
       : _velocity = velocity.normalized(),
         _speed = speed ?? defaultSpeed,
@@ -144,10 +145,11 @@ class UFOGameBonus extends GameBonus {
   // color of the asteroid
   static final _paint = Paint()..color = Colors.white;
 
-  UFOGameBonus(Vector2 position, Vector2 velocity, int triggerTimeSeconds,
-      Vector2 resolutionMultiplier)
-      : super.fullInit(
-            position, velocity, triggerTimeSeconds, resolutionMultiplier,
+  UFOGameBonus(
+    Vector2 position,
+    Vector2 velocity,
+    int triggerTimeSeconds,
+  ) : super.fullInit(position, velocity, triggerTimeSeconds,
             size: defaultSize,
             speed: GameBonus.defaultSpeed,
             health: GameBonus.defaultHealth,
@@ -157,17 +159,9 @@ class UFOGameBonus extends GameBonus {
 
   //
   // named constructor
-  UFOGameBonus.fullInit(
-      Vector2 position,
-      Vector2 velocity,
-      Vector2 size,
-      int triggerTimeSeconds,
-      resolutionMultiplier,
-      double? speed,
-      int? health,
-      int? damage)
-      : super.fullInit(
-            position, velocity, triggerTimeSeconds, resolutionMultiplier,
+  UFOGameBonus.fullInit(Vector2 position, Vector2 velocity, Vector2 size,
+      int triggerTimeSeconds, double? speed, int? health, int? damage)
+      : super.fullInit(position, velocity, triggerTimeSeconds,
             size: size, speed: speed, health: health, damage: damage) {
     add(RectangleHitbox());
   }

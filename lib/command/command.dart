@@ -151,7 +151,7 @@ class BulletFiredCommand extends Command {
       ..position =
           _getController().getSpaceship().getMuzzleComponent.absolutePosition
       ..velocity = velocity
-      ..size = Vector2.all(8);
+      ..size = Vector2.all(16);
     Bullet myBullet = BulletFactory.create(context);
     // add the bullet to the controller's game tree
     _getController().add(myBullet);
@@ -265,10 +265,6 @@ class AsteroidCollisionCommand extends Command {
       if (canBeSplit) {
         ExplosionOfSplitAsteroidRenderCommand(_targetAsteroid)
             .addToController(_getController());
-        //
-        // calculate the vectors for the new asteroids
-        //
-        //
 
         // clone the vector target data so that we have a safe copy
         Vector2 asteroidAVelocity = _targetAsteroid.getVelocity.clone();

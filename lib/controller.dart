@@ -25,8 +25,6 @@ import 'space_ship/spaceship.dart';
 
 /// 管理者，掌握遊戲內的元件與操作
 class Controller extends Component with HasGameRef<SpaceshipGame> {
-  /// the number of lives that a player starts with (which is the start life
-  /// and 3 extra lives)
   static const defaultNumberOfLives = 1;
   static const defaultStartLevel = 0;
 
@@ -53,12 +51,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
 
   /// JSON Data from initialization
   late dynamic jsonData;
-
-  /// 遊戲設計的解析度
-  late Vector2 _baseResolution;
-
-  /// 計算不同顯示裝置上的參數比例，可適用於元件的位置、大小、速度，保持最佳的顯示效果
-  final Vector2 _resolutionMultiplier = Vector2.all(1.0);
 
   late ScoreBoard _scoreboard;
 
@@ -104,26 +96,10 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   Future<void> init() async {
     jsonData = await JSONUtils.readJSONInitData();
 
-    /// read in the resolution and calculate the resolution multiplier
-    ///
-    _baseResolution = JSONUtils.extractBaseGameResolution(jsonData);
-
-    /// calculate the multiplier
-    _resolutionMultiplier.x = gameRef.size.x / _baseResolution.x;
-    _resolutionMultiplier.y = gameRef.size.y / _baseResolution.y;
-
     await addScoreBoard();
     await addParallax();
     addJoystick();
-
-    controllerTimer = TimerComponent(
-      period: 1,
-      repeat: true,
-      onTick: () {
-        timerNotification();
-      },
-    );
-    add(controllerTimer);
+    addTimer();
 
     spawnNewPlayer();
   }
@@ -259,6 +235,17 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
     remove(_joystick);
   }
 
+  void addTimer() {
+    controllerTimer = TimerComponent(
+      period: 1,
+      repeat: true,
+      onTick: () {
+        timerNotification();
+      },
+    );
+    add(controllerTimer);
+  }
+
   void addRestartButton() {
     restartButton = ButtonComponent(
       size: Vector2.all(100),
@@ -293,14 +280,6 @@ class Controller extends Component with HasGameRef<SpaceshipGame> {
   ///
   List<GameLevel> get getLevels {
     return _gameLevels;
-  }
-
-  Vector2 get getBaseResolution {
-    return _baseResolution;
-  }
-
-  Vector2 get getResolutionMultiplier {
-    return _resolutionMultiplier;
   }
 
   ScoreBoard get getScoreBoard {

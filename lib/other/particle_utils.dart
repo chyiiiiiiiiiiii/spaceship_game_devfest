@@ -24,22 +24,19 @@ abstract class Explosion {
   late Vector2 _position = defaultPosition;
   Vector2 _size = defaultSize;
   int _particleCount = defaultParticleCount;
-  late Vector2 _resolutionMultiplier = defaultMultiplier;
   Images? _images;
 
   //
   // default constructor with default values
   Explosion(Vector2 resolutionMultiplier, Vector2 position) {
-    _resolutionMultiplier = resolutionMultiplier;
     _position = position;
   }
 
   //
   // named constructor
-  Explosion.fullInit(Vector2 resolutionMultiplier, Vector2 position,
+  Explosion.fullInit(Vector2 position,
       {double? lifespan, int? particleCount, Vector2? size, Images? images})
-      : _resolutionMultiplier = resolutionMultiplier,
-        _position = position,
+      : _position = position,
         _lifespan = lifespan ?? defaultLifespan,
         _particleCount = particleCount ?? defaultParticleCount,
         _size = size ?? defaultSize,
@@ -88,17 +85,17 @@ class ParticleExplosion360 extends Explosion {
   // color of the particles
   static final _paint = Paint()..color = Colors.red;
 
-  ParticleExplosion360(Vector2 resolutionMultiplier, Vector2 position)
-      : super.fullInit(resolutionMultiplier, position,
+  ParticleExplosion360(Vector2 position)
+      : super.fullInit(position,
             size: defaultSize,
             lifespan: defaultLifespan,
             particleCount: defaultParticleCount);
 
   //
   // named constructor
-  ParticleExplosion360.fullInit(Vector2 resolutionMultiplier, Vector2 position,
-      Vector2? size, double? lifespan, int? particleCount)
-      : super.fullInit(resolutionMultiplier, position,
+  ParticleExplosion360.fullInit(
+      Vector2 position, Vector2? size, double? lifespan, int? particleCount)
+      : super.fullInit(position,
             size: size, lifespan: lifespan, particleCount: particleCount);
 
   @override
@@ -150,8 +147,8 @@ class ParticleBonusExplosion extends Explosion {
   // color of the particles
   static final _paint = Paint()..color = Colors.white;
 
-  ParticleBonusExplosion(Vector2 resolutionMultiplier, Vector2 position)
-      : super.fullInit(resolutionMultiplier, position,
+  ParticleBonusExplosion(Vector2 position)
+      : super.fullInit(position,
             size: defaultSize,
             lifespan: defaultLifespan,
             particleCount: defaultParticleCount);
@@ -160,7 +157,7 @@ class ParticleBonusExplosion extends Explosion {
   // named constructor
   ParticleBonusExplosion.fullInit(Vector2 resolutionMultiplier,
       Vector2 position, Vector2? size, double? lifespan, int? particleCount)
-      : super.fullInit(resolutionMultiplier, position,
+      : super.fullInit(position,
             size: size, lifespan: lifespan, particleCount: particleCount);
 
   @override
@@ -205,17 +202,17 @@ class FieryExplosion extends Explosion {
   static const double defaultLifespan = 3.0;
   static final Vector2 defaultSize = Vector2.all(1.5);
 
-  FieryExplosion(Vector2 resolutionMultiplier, Vector2 position)
-      : super.fullInit(resolutionMultiplier, position,
+  FieryExplosion(Vector2 position)
+      : super.fullInit(position,
             size: defaultSize,
             lifespan: defaultLifespan,
             particleCount: Explosion.defaultParticleCount);
 
   //
   // named constructor
-  FieryExplosion.fullInit(Vector2 resolutionMultiplier, Vector2 position,
-      Vector2? size, double? lifespan, int? particleCount, Images? images)
-      : super.fullInit(resolutionMultiplier, position,
+  FieryExplosion.fullInit(Vector2 position, Vector2? size, double? lifespan,
+      int? particleCount, Images? images)
+      : super.fullInit(position,
             size: size,
             lifespan: lifespan,
             particleCount: particleCount,
@@ -283,14 +280,13 @@ class ExplosionFactory {
     switch (context.explosionType) {
       case ExplosionEnum.largeParticleExplosion:
         {
-          preResult =
-              ParticleExplosion360(context.multiplier, context.position);
+          preResult = ParticleExplosion360(context.position);
         }
         break;
 
       case ExplosionEnum.mediumParticleExplosion:
         {
-          preResult = ParticleExplosion360(context.multiplier, context.position)
+          preResult = ParticleExplosion360(context.position)
             .._particleCount = 20
             .._lifespan = 1.5;
         }
@@ -298,16 +294,15 @@ class ExplosionFactory {
 
       case ExplosionEnum.bonusExplosion:
         {
-          preResult =
-              ParticleBonusExplosion(context.multiplier, context.position)
-                .._particleCount = 60
-                .._lifespan = 2.0;
+          preResult = ParticleBonusExplosion(context.position)
+            .._particleCount = 60
+            .._lifespan = 2.0;
         }
         break;
 
       case ExplosionEnum.fieryExplosion:
         {
-          preResult = FieryExplosion(context.multiplier, context.position)
+          preResult = FieryExplosion(context.position)
             .._images = context.images;
         }
         break;
@@ -325,7 +320,6 @@ class ExplosionBuildContext {
   static final Vector2 defaultPosition = Vector2(-1, -1);
   static final Vector2 defaultSize = Vector2.zero();
   static final ExplosionEnum defaultExplosionType = ExplosionEnum.values[0];
-  static final Vector2 defaultMultiplier = Vector2.all(1.0);
 
   /// helper method for parsing out strings into corresponding enum values
   ///
@@ -338,7 +332,6 @@ class ExplosionBuildContext {
   Vector2 position = defaultPosition;
   Vector2 size = defaultSize;
   int particleCount = defaultParticleCount;
-  Vector2 multiplier = defaultMultiplier;
   ExplosionEnum explosionType = defaultExplosionType;
   Images? images;
 
@@ -350,6 +343,6 @@ class ExplosionBuildContext {
   /// values when debugging.
   ///
   String toString() {
-    return 'name: $explosionType , position: $position , lifespan: $lifespan, multiplier: $multiplier';
+    return 'name: $explosionType , position: $position , lifespan: $lifespan';
   }
 }
